@@ -1,0 +1,67 @@
+#!/bin/sh
+
+# testsuite — Testsuite for Webmachine
+
+# Webmachine (https://github.com/melusina-org/cl-webmachine)
+# This file is part of Webmachine.
+#
+# Copyright © 2018–2023 Michaël Le Barbier
+# All rights reserved.
+
+# This file must be used under the terms of the MIT License.
+# This source file is licensed as described in the file LICENSE, which
+# you should have received as part of this distribution. The terms
+# are also available at https://opensource.org/licenses/MIT
+
+: ${TOPLEVELDIR:=$(git rev-parse --show-toplevel)}
+: ${testsuitesystem:="org.melusina.webmachine/testsuite"}
+: ${testsuiteclean:='no'}
+: ${testsuitelisp:='sbcl'}
+
+testsuite_lisp()
+{
+    case "${testsuitelisp}" in
+	sbcl)
+	    sbcl --noinform --disable-debugger "$@"
+	    ;;
+	ccl|ccl64)
+	    ccl64 "$@"
+	    ;;
+    esac
+}
+
+testsuite_run()
+{
+    if [ $# -eq 0 ]; then
+	set -- 'run-all-tests'
+    fi
+    testsuite_lisp\
+	--eval "(ql:quickload \"${testsuitesystem}\" :silent t)"\
+	--eval "(${testsuitesystem}:$1)"\
+	--eval '(org.melusina.confidence:quit)'
+}
+
+testsuite_main()
+{
+    local OPTIND OPTION OPTARG
+    OPTIND=1
+
+    while getopts 'CL:' OPTION; do
+	case "${OPTION}" in
+	    C)	testsuiteclean='yes';;
+	    L)	testsuitelisp="${OPTARG}";;
+	esac
+    done
+
+    shift $((OPTIND - 1))
+
+    if [ "${testsuiteclean}" = 'yes' ]; then
+	(cd "${TOPLEVELDIR}" && development/clean)
+    fi
+    
+    testsuite_run "$@"
+}
+
+testsuite_main "$@"
+
+# End of file `testsuite'

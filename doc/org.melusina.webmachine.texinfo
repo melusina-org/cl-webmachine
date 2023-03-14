@@ -1,0 +1,185 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename org.melusina.webmachine.info
+@settitle Webmachine Manual
+@c %**end of header
+
+@c for install-info
+@dircategory Software development
+@direntry
+* org.melusina.webmachine: HTTP Semantic Awareness on top of Hunchentoot
+@end direntry
+
+@copying
+Webmachine software and associated documentation is distributed
+under the terms of the MIT License.
+
+@quotation
+Copyright © 2018–2023 Michaël Le Barbier
+All rights reserved.
+
+This file must be used under the terms of the MIT License.
+This source file is licensed as described in the file LICENSE, which
+you should have received as part of this distribution. The terms
+are also available at https://opensource.org/licenses/MIT
+@end quotation
+
+@end copying
+@titlepage
+
+@title Webmachine Manual
+@subtitle draft version
+
+@c The following two commands start the copyright page.
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+
+@end titlepage
+
+@contents
+
+@c We use @andkey, etc to escape & from TeX in lambda lists --
+@c so we need to define them for info as well.
+@macro andallowotherkeys
+&allow-other-keys
+@end macro
+@macro andoptional
+&optional
+@end macro
+@macro andrest
+&rest
+@end macro
+@macro andkey
+&key
+@end macro
+@macro andbody
+&body
+@end macro
+
+@ifnottex
+
+@include include/ifnottex.texinfo
+
+@node Top, , ,
+@comment  node-name,  next,  previous,  up
+@top Webmachine
+
+@insertcopying
+
+@menu
+* Introduction::
+* Configuration::
+* Condition::
+@end menu
+
+@end ifnottex
+
+@node Introduction, , Top, Top
+@chapter Introduction
+
+Webmachine is an application layer that adds HTTP semantic awareness
+on top of the excellent bit-pushing and HTTP syntax-management
+provided by Hunchentoot, and provides a simple and clean way to
+connect that to your application's behavior.
+
+The design is inspired by the mythic Webmachine of Erlang and honours
+it with that name.
+
+@node Configuration, Condition, Top, Top
+@chapter Configuration
+@include include/var-org.melusina.webmachine-star-catch-errors-star.texinfo
+
+@node Condition, Content, Configuration, Top
+@chapter Protocol Condition
+
+@include include/condition-org.melusina.webmachine-http-condition.texinfo
+@include include/condition-org.melusina.webmachine-http-error.texinfo
+@include include/fun-org.melusina.webmachine-http-condition-short-description.texinfo
+@include include/fun-org.melusina.webmachine-http-error.texinfo
+
+@node Content, Request, Condition, Top
+@chapter Output Content
+
+@include include/macro-org.melusina.webmachine-with-content-output-to-sequence.texinfo
+@include include/fun-org.melusina.webmachine-make-content-output-stream.texinfo
+
+@node Request, Reply, Content, Top
+@chapter Request
+
+Many accessors and slots can be used from the HUNCHENTOOT package.
+
+@include include/class-org.melusina.webmachine-request.texinfo
+
+
+@node Reply, Request Method, Request, Top
+@chapter Reply
+
+Many accessors and slots can be used from the HUNCHENTOOT package.
+
+@include include/class-org.melusina.webmachine-reply.texinfo
+
+
+@node Request Method, Media Type, Reply, Top
+@chapter Repository of Request Methods
+
+@include include/class-org.melusina.webmachine-request-method.texinfo
+@include include/fun-org.melusina.webmachine-request-method-p.texinfo
+@include include/fun-org.melusina.webmachine-make-request-method.texinfo
+@include include/macro-org.melusina.webmachine-define-request-method.texinfo
+@include include/fun-org.melusina.webmachine-find-request-method.texinfo
+@include include/fun-org.melusina.webmachine-remove-request-method.texinfo
+@include include/fun-org.melusina.webmachine-list-request-methods.texinfo
+@include include/fun-org.melusina.webmachine-describe-request-methods.texinfo
+
+
+@node Media Type, Path, Request Method, Top
+@chapter Repository of Media Types
+
+@include include/class-org.melusina.webmachine-media-type.texinfo
+@include include/fun-org.melusina.webmachine-media-type-p.texinfo
+@include include/fun-org.melusina.webmachine-make-media-type.texinfo
+@include include/macro-org.melusina.webmachine-define-media-type.texinfo
+@include include/fun-org.melusina.webmachine-find-media-type.texinfo
+@include include/fun-org.melusina.webmachine-remove-media-type.texinfo
+@include include/fun-org.melusina.webmachine-list-media-types.texinfo
+@include include/fun-org.melusina.webmachine-describe-media-types.texinfo
+@include include/fun-org.melusina.webmachine-match-media-type-p.texinfo
+
+@node Path, Resource, Media Type, Top
+@chapter Resource Path
+
+@node Resource, Semantic, Path, Top
+@chapter Repository of Resources
+@include include/class-org.melusina.webmachine-resource.texinfo
+@include include/fun-org.melusina.webmachine-resource-p.texinfo
+@include include/fun-org.melusina.webmachine-find-resource.texinfo
+@include include/fun-org.melusina.webmachine-remove-resource.texinfo
+
+@node Semantic, Acceptor, Resource, Top
+@chapter HTTP Protocol Semantic of Resource Operations
+
+@include include/fun-org.melusina.webmachine-resource-available-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-known-methods.texinfo
+@include include/fun-org.melusina.webmachine-resource-uri-too-long-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-payload-too-large-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-allowed-methods.texinfo
+@include include/fun-org.melusina.webmachine-resource-valid-request-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-authorized-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-forbidden-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-valid-content-headers-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-valid-content-type-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-options.texinfo
+@include include/fun-org.melusina.webmachine-resource-languages-provided.texinfo
+@include include/fun-org.melusina.webmachine-resource-content-types-provided.texinfo
+@include include/fun-org.melusina.webmachine-resource-to-text-slash-html.texinfo
+@include include/fun-org.melusina.webmachine-resource-charsets-provided.texinfo
+@include include/fun-org.melusina.webmachine-resource-encodings-provided.texinfo
+
+@node Acceptor, , Resource, Top
+@chapter Acceptor
+
+@include include/class-org.melusina.webmachine-acceptor.texinfo
+@include include/fun-org.melusina.webmachine-make-acceptor.texinfo
+
+@bye
