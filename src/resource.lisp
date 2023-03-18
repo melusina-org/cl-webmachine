@@ -484,11 +484,6 @@ This walks down the decision graph of the Webmachine."
        (make-allow-header (allowed-methods)
          (with-output-to-string (allow)
            (format allow "~{~A~^, ~}" allowed-methods)))
-       (setf-content-details (details)
-         (setf (hunchentoot:header-out :content-type reply)
-               (slot-value (find-media-type (car details)) 'name))
-	 (setf (slot-value reply 'content-handler)
-               (cdr details)))
        (set-header-out (headers reply)
 	 "Set outgoing HEADERS on REPLY, without overwriting them."
 	 (mapcar (lambda (key-value)
@@ -498,6 +493,44 @@ This walks down the decision graph of the Webmachine."
 		 headers))
        (halt (status-code)
          (http-error status-code))
+       (choose-content-type (&optional content-type)
+	 (let ((chosen
+		 (or content-type
+		     (negotiate-accept
+		      (parse-header-accept-* (hunchentoot:header-in :accept request))
+		      (resource-content-types-provided resource)))))
+	   (when chosen
+	     (destructuring-bind (media-type . content-handler) chosen
+	       (setf media-type
+		     (find-media-type media-type))
+               (setf (hunchentoot:header-out :content-type reply)
+		     (media-type-name media-type))
+	       (setf (slot-value reply 'content-handler)
+		     content-handler)))
+	   chosen))
+       (choose-language ()
+	 (let ((language
+                 (negotiate-accept-language
+                  (parse-header-accept-* (hunchentoot:header-in :accept-language request))
+                  (resource-languages-provided resource))))
+           (when language
+             (setf (slot-value request 'language) language))))
+       (choose-charset (&optional charset)
+	 (let ((chosen
+		 (or charset
+                     (negotiate-accept-charset
+                      (parse-header-accept-* (hunchentoot:header-in :accept-charset request))
+                      (resource-charsets-provided resource)))))
+           (setf (slot-value request 'charset) chosen)))
+       (choose-encoding ()
+	 (let ((encoding
+                 (negotiate-accept-encoding
+                  (parse-header-accept-* (hunchentoot:header-in :accept-encoding request))
+                  (resource-encodings-provided resource))))
+	   (when encoding
+             (setf (slot-value request 'encoding) encoding)
+	     (setf (hunchentoot:header-out :encoding reply)
+		   (string-downcase encoding)))))
        (v3b13 ()
          (if (resource-available-p resource)
 	     (v3b12)
@@ -555,73 +588,50 @@ This walks down the decision graph of the Webmachine."
        (v3c3 ()
          (let ((content-types-provided
                  (resource-content-types-provided resource))
-               (accept
+               (content-types-accepted
                  (hunchentoot:header-in :accept request)))
            (cond
-             ((and (null accept) (null content-types-provided))
+             ((and (null content-types-accepted) (null content-types-provided))
               (halt 500))
-             ((null accept)
-              (setf-content-details (first content-types-provided))
+             ((null content-types-accepted)
+              (choose-content-type (first content-types-provided))
               (v3d4))
              (t
               (v3c4)))))
        (v3c4 ()
-         (let ((negotiated
-                 (negotiate-accept
-                  (parse-header-accept-* (hunchentoot:header-in :accept request))
-                  (resource-content-types-provided resource))))
-           (if negotiated
-               (progn
-                 (setf-content-details negotiated)
-                 (v3d4))
-               (halt 406))))
+         (if (choose-content-type)
+	     (v3d4)
+	     (halt 406)))
        (v3d4 ()
          (if (hunchentoot:header-in :accept-language request)
              (v3d5)
              (v3e5)))
        (v3d5 ()
-         (let ((negotiated
-                 (negotiate-accept-language
-                  (parse-header-accept-* (hunchentoot:header-in :accept-language request))
-                  (resource-languages-provided resource))))
-           (if negotiated
-               (progn
-                 (setf (slot-value request 'language) negotiated)
-                 (v3e5))
-               (halt 406))))
+         (if (choose-language)
+             (v3e5)
+             (halt 406)))
        (v3e5 ()
-         (if (hunchentoot:header-in :accept-charset request)
-             (v3e6)
-             (progn
-	       (setf (slot-value request 'charset)
-		     (first (resource-charsets-provided resource)))
-	       (v3f6))))
-       (v3e6 ()
-         (let ((negotiated
-                 (negotiate-accept-charset
-                  (parse-header-accept-* (hunchentoot:header-in :accept-charset request))
-                  (resource-charsets-provided resource))))
-           (if negotiated
+         (let ((charsets-provided
+                 (resource-charsets-provided resource))
+               (charsets-accepted
+                 (hunchentoot:header-in :accept-charset request)))
+           (if charsets-accepted
+               (v3e6)
                (progn
-                 (setf (slot-value request 'charset) negotiated)
-                 (v3f6))
-               (halt 406))))
+		 (choose-charset (first charsets-provided))
+		 (v3f6)))))
+       (v3e6 ()
+         (if (choose-charset)
+             (v3f6)
+             (halt 406)))
        (v3f6 ()
          (if (hunchentoot:header-in :accept-encoding request)
              (v3f7)
              (v3g7)))
        (v3f7 ()
-         (let ((negotiated
-                 (negotiate-accept-encoding
-                  (parse-header-accept-* (hunchentoot:header-in :accept-encoding request))
-                  (resource-encodings-provided resource))))
-           (if negotiated
-               (progn
-                 (setf (slot-value request 'encoding) negotiated)
-		 (setf (hunchentoot:header-out :encoding reply)
-		       (string-downcase negotiated))
-                 (v3g7))
-               (halt 406))))
+         (if (choose-encoding)
+             (v3g7)
+             (halt 406)))
        (v3g7 ()
          (response)))
     (v3b13)))
