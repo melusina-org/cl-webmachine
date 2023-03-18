@@ -22,6 +22,10 @@
     :initform (error "No request-method IDENTIFIER.")
     :initarg :identifier
     :documentation "A string representing the REQUEST-METHOD.")
+   (request-class
+    :initform 'request
+    :initarg :request-class
+    :documentation "The specialized class of requests associated to this method.")
    (destructive-p
     :initform (error "No request-method DESTRUCTIVE-P flag.")
     :initarg :destructive-p
@@ -38,7 +42,7 @@ generated documents."))
 (defun request-method-name (instance)
   "The name of a request method."
   (check-type instance request-method)
-  (string (slot-value request-method 'identifier)))
+  (string (slot-value instance 'identifier)))
 
 (defmethod print-object ((object request-method) stream)
   (format stream "#<REQUEST-METHOD ~S>" (slot-value object 'identifier)))
@@ -55,6 +59,11 @@ When a request-method is defined, it is added to this table, using its identifie
   "Predicate recognising request-methods."
   (typep thing 'request-method))
 
+
+;;;;
+;;;; Request Method Repository
+;;;;
+
 (defun find-request-method (designator)
 "Find a request-method whose identifier matches DESIGNATOR.
 When a request method corresponding to DESIGNATOR is found, this request
@@ -69,6 +78,8 @@ a keyword, a request-method, or a symbol."
               *request-method-repository*))
     ((request-method-p designator)
      (find-request-method (slot-value designator 'identifier)))
+    ((typep designator 'hunchentoot:request)
+     (find-request-method (hunchentoot:request-method designator)))
     ((and designator (symbolp designator))
      (gethash designator *request-method-repository*))
     (t
@@ -82,15 +93,15 @@ Return T if there was such an entry, or NIL if not."
     (when request-method
       (remhash (slot-value request-method 'identifier) *request-method-repository*))))
 
-(defun make-request-method (&rest initargs &key identifier destructive-p description)
+(defun make-request-method (&rest initargs &key identifier request-class destructive-p description)
   "Make a request-method with the given IDENTIFIER and ARGS."
-  (declare (ignore destructive-p description))
+  (declare (ignore request-class destructive-p description))
   (remove-request-method identifier)
   (apply #'make-instance 'request-method initargs))
 
-(defmacro define-request-method (identifier &rest initargs &key destructive-p description)
+(defmacro define-request-method (identifier &rest initargs &key request-class destructive-p description)
   "Define a request-method with the given IDENTIFIER and ARGS."
-  (declare (ignore destructive-p description))
+  (declare (ignore request-class destructive-p description))
   `(make-request-method :identifier ,identifier ,@initargs))
 
 (defun list-request-methods ()
@@ -107,45 +118,54 @@ Return T if there was such an entry, or NIL if not."
 
 (defparameter *request-method-repository-initial-content*
   '((:identifier :get
+     :request-class get-request
      :destructive-p nil
      :description "The GET method requests a representation of the specified resource.
 Requests using GET should only retrieve data.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET")
     (:identifier :head
+     :request-class head-request
      :destructive-p nil
      :description "The HEAD method asks for a response nearly identical to that of a GET request,
 but without the response body.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD")
     (:identifier :post
+     :request-class post-request
      :destructive-p t
      :description "The POST method is used to submit an entity to the specified resource,
 often causing a change in state or side effects on the server.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST")
     (:identifier :put
+     :request-class put-request
      :destructive-p t
      :description "The PUT method replaces all current representations of the target resource
 with the request payload.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT")
     (:identifier :delete
+     :request-class delete-request
      :destructive-p t
      :description "The DELETE method deletes the specified resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE")
     (:identifier :connect
+     :request-class connect-request
      :destructive-p nil
      :description "The CONNECT method establishes a tunnel to the server identified
 by the target resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT")
     (:identifier :options
+     :request-class options-request
      :destructive-p nil
      :description "The OPTIONS method is used to describe the communication options
 for the target resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS")
     (:identifier :trace
+     :request-class trace-request
      :destructive-p nil
      :description "The TRACE method performs a message loop-back test along the path
 to the target resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/TRACE")
     (:identifier :patch
+     :request-class patch-request
      :destructive-p t
      :description "The PATCH method is used to apply partial modifications to a resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH")))

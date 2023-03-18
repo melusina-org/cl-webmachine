@@ -465,6 +465,8 @@ This walks down the decision graph of the Webmachine."
   (declare (optimize (debug 3) (safety 3)))
   (labels
       ((response ()
+	 (specialize-request)
+	 (specialize-reply)
          (let ((external-format
 		 (when (slot-value request 'charset)
                    (flexi-streams:make-external-format (slot-value request 'charset)))))
@@ -481,6 +483,22 @@ This walks down the decision graph of the Webmachine."
 		(write-string (slot-value reply 'content-handler) response-body))
                (t
 		(funcall (slot-value reply 'content-handler) resource request response-body))))))
+       (specialize-request ()
+	 "Specialize REQUEST according to its request method."
+	 (check-type request hunchentoot:request)
+	 (let ((request-method
+		 (find-request-method request)))
+	   (when request-method
+	     (change-class request (slot-value request-method 'request-class))))
+	 request)
+       (specialize-reply ()
+	 "Specialize REPLY according to its content type."
+	 (check-type reply hunchentoot:reply)
+	 (let ((media-type
+		 (find-media-type (hunchentoot:content-type reply))))
+	   (when media-type
+	     (change-class reply (slot-value media-type 'reply-class))))
+	 reply)
        (make-allow-header (allowed-methods)
          (with-output-to-string (allow)
            (format allow "~{~A~^, ~}" allowed-methods)))
