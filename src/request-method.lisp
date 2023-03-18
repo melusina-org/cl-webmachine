@@ -18,10 +18,10 @@
 ;;;
 
 (defclass request-method nil
-  ((name
-    :initform (error "No request-method NAME.")
-    :initarg :name
-    :documentation "A keyword representing the REQUEST-METHOD.")
+  ((identifier
+    :initform (error "No request-method IDENTIFIER.")
+    :initarg :identifier
+    :documentation "A string representing the REQUEST-METHOD.")
    (destructive-p
     :initform (error "No request-method DESTRUCTIVE-P flag.")
     :initarg :destructive-p
@@ -35,23 +35,28 @@ generated documents."))
   (:documentation
    "This a request method for the HTTP protocol."))
 
+(defun request-method-name (instance)
+  "The name of a request method."
+  (check-type instance request-method)
+  (string (slot-value request-method 'identifier)))
+
 (defmethod print-object ((object request-method) stream)
-  (format stream "#<REQUEST-METHOD ~S>" (slot-value object 'name)))
+  (format stream "#<REQUEST-METHOD ~S>" (slot-value object 'identifier)))
 
 (defvar *request-method-repository* (make-hash-table)
   "A repository for request methods.
-When a request-method is defined, it is added to this table, using its name–a keyword–as the key.")
+When a request-method is defined, it is added to this table, using its identifier–a keyword–as the key.")
 
 (defmethod initialize-instance :after ((instance request-method) &rest initargs &key &allow-other-keys)
   (declare (ignore initargs))
-  (setf (gethash (slot-value instance 'name) *request-method-repository*) instance))
+  (setf (gethash (slot-value instance 'identifier) *request-method-repository*) instance))
 
 (defun request-method-p (thing)
   "Predicate recognising request-methods."
   (typep thing 'request-method))
 
 (defun find-request-method (designator)
-"Find a request-method whose name matches DESIGNATOR.
+"Find a request-method whose identifier matches DESIGNATOR.
 When a request method corresponding to DESIGNATOR is found, this request
 method is returned, otherwise NIL is returned. The DESIGNATOR can be a string,
 a keyword, a request-method, or a symbol."
@@ -63,7 +68,7 @@ a keyword, a request-method, or a symbol."
                   (return-from find-request-method v)))
               *request-method-repository*))
     ((request-method-p designator)
-     (find-request-method (slot-value designator 'name)))
+     (find-request-method (slot-value designator 'identifier)))
     ((and designator (symbolp designator))
      (gethash designator *request-method-repository*))
     (t
@@ -75,18 +80,18 @@ Return T if there was such an entry, or NIL if not."
   (let ((request-method
 	  (find-request-method designator)))
     (when request-method
-      (remhash (slot-value request-method 'name) *request-method-repository*))))
+      (remhash (slot-value request-method 'identifier) *request-method-repository*))))
 
-(defun make-request-method (&rest initargs &key name destructive-p description)
-  "Make a request-method with the given NAME and ARGS."
+(defun make-request-method (&rest initargs &key identifier destructive-p description)
+  "Make a request-method with the given IDENTIFIER and ARGS."
   (declare (ignore destructive-p description))
-  (remove-request-method name)
+  (remove-request-method identifier)
   (apply #'make-instance 'request-method initargs))
 
-(defmacro define-request-method (name &rest initargs &key destructive-p description)
-  "Define a request-method with the given NAME and ARGS."
+(defmacro define-request-method (identifier &rest initargs &key destructive-p description)
+  "Define a request-method with the given IDENTIFIER and ARGS."
   (declare (ignore destructive-p description))
-  `(make-request-method :name ,name ,@initargs))
+  `(make-request-method :identifier ,identifier ,@initargs))
 
 (defun list-request-methods ()
   "A list of designators of all request-methods known to the system."
@@ -101,46 +106,46 @@ Return T if there was such an entry, or NIL if not."
              *request-method-repository*)))
 
 (defparameter *request-method-repository-initial-content*
-  '((:name :get
+  '((:identifier :get
      :destructive-p nil
      :description "The GET method requests a representation of the specified resource.
 Requests using GET should only retrieve data.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET")
-    (:name :head
+    (:identifier :head
      :destructive-p nil
      :description "The HEAD method asks for a response nearly identical to that of a GET request,
 but without the response body.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD")
-    (:name :post
+    (:identifier :post
      :destructive-p t
      :description "The POST method is used to submit an entity to the specified resource,
 often causing a change in state or side effects on the server.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST")
-    (:name :put
+    (:identifier :put
      :destructive-p t
      :description "The PUT method replaces all current representations of the target resource
 with the request payload.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT")
-    (:name :delete
+    (:identifier :delete
      :destructive-p t
      :description "The DELETE method deletes the specified resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE")
-    (:name :connect
+    (:identifier :connect
      :destructive-p nil
      :description "The CONNECT method establishes a tunnel to the server identified
 by the target resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT")
-    (:name :options
+    (:identifier :options
      :destructive-p nil
      :description "The OPTIONS method is used to describe the communication options
 for the target resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS")
-    (:name :trace
+    (:identifier :trace
      :destructive-p nil
      :description "The TRACE method performs a message loop-back test along the path
 to the target resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/TRACE")
-    (:name :patch
+    (:identifier :patch
      :destructive-p t
      :description "The PATCH method is used to apply partial modifications to a resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH")))

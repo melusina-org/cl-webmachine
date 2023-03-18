@@ -48,4 +48,47 @@ The possible values for this field are:
 about an incoming request. They are created automatically by
 acceptors and can be accessed by the corresponding handler."))
 
+(defclass get-request (request) nil
+  (:documentation "The GET method requests a representation of the specified resource.
+Requests using GET should only retrieve data.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET"))
+
+(defclass head-request (request) nil
+  (:documentation "The HEAD method asks for a response nearly identical to that of a GET request,
+but without the response body.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD"))
+
+(defclass post-request (request) nil
+  (:documentation "The POST method is used to submit an entity to the specified resource,
+often causing a change in state or side effects on the server.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST"))
+
+(defclass put-request (request) nil
+  (:documentation "The PUT method replaces all current representations of the target resource
+with the request payload.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT"))
+
+(defclass delete-request (request) nil
+  (:documentation "The DELETE method deletes the specified resource.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE"))
+
+(defclass connect-request (request) nil
+  (:documentation "The CONNECT method establishes a tunnel to the server identified
+by the target resource.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT"))
+
+(defclass options-request (request) nil
+  (:documentation "The OPTIONS method is used to describe the communication options
+for the target resource.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS"))
+
+(defclass trace-request (request) nil
+  (:documentation "The TRACE method performs a message loop-back test along the path
+to the target resource.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/TRACE"))
+
+(defclass patch-request (request) nil
+  (:documentation "The PATCH method is used to apply partial modifications to a resource.
+WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH"))
+
 ;;;; End of file `request.lisp'

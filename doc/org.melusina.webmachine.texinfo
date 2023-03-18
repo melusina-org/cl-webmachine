@@ -110,7 +110,15 @@ it with that name.
 Many accessors and slots can be used from the HUNCHENTOOT package.
 
 @include include/class-org.melusina.webmachine-request.texinfo
-
+@include include/class-org.melusina.webmachine-get-request.texinfo
+@include include/class-org.melusina.webmachine-head-request.texinfo
+@include include/class-org.melusina.webmachine-post-request.texinfo
+@include include/class-org.melusina.webmachine-put-request.texinfo
+@include include/class-org.melusina.webmachine-delete-request.texinfo
+@include include/class-org.melusina.webmachine-connect-request.texinfo
+@include include/class-org.melusina.webmachine-options-request.texinfo
+@include include/class-org.melusina.webmachine-trace-request.texinfo
+@include include/class-org.melusina.webmachine-patch-request.texinfo
 
 @node Reply, Request Method, Request, Top
 @chapter Reply

@@ -35,6 +35,15 @@
    #:language
    #:charset
    #:encoding
+   #:get-request
+   #:head-request
+   #:post-request
+   #:put-request
+   #:delete-request
+   #:connect-request
+   #:options-request
+   #:trace-request
+   #:patch-request
    ;; Reply
    #:reply
    #:application-reply
