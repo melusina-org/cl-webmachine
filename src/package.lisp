@@ -37,7 +37,21 @@
    #:encoding
    ;; Reply
    #:reply
-   #:content-handler
+   #:application-reply
+   #:audio-reply
+   #:font-reply
+   #:image-reply
+   #:model-reply
+   #:text-reply
+   #:video-reply
+   #:application/octet-stream-reply
+   #:text/css-reply
+   #:text/html-reply
+   #:text/javascript-reply
+   #:text/plain-reply
+   #:image/jpeg-reply
+   #:image/png-reply
+   #:image/svg+xml-reply
    ;; Repository of Request Methods
    #:request-method
    #:name

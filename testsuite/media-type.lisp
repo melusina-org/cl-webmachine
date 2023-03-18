@@ -13,20 +13,33 @@
 
 (in-package #:org.melusina.webmachine/testsuite)
 
-(define-testcase ensure-important-mime-types-for-web-developers-are-known ()
-  (let ((important-mime-types
-	  '("application/octet-stream"
-	    "text/plain"
-	    "text/css"
-	    "text/html"
-	    "text/javascript")))
-    (loop :for important-mime-type :in important-mime-types
-	  :do (assert-t* (webmachine:find-media-type important-mime-type)))))
+(define-testcase ensure-media-types-are-known (media-types)
+  (loop :for important-media-type :in media-types
+	:do (assert-t* (webmachine:find-media-type important-media-type))))
+
+(define-testcase ensure-repository-keys-are-keywords ()
+  (loop :for key :being :the :hash-key :of webmachine::*media-type-repository*
+	:do (assert-type key 'keyword)))
+
+(define-testcase ensure-main-media-types-categories-are-correctly-defined ()
+  (ensure-media-types-are-known '(:application :audio :font :image :model :text :video))
+  (assert-nil (webmachine:find-media-type :example)))
+
+(define-testcase ensure-important-media-types-for-web-developers-are-known ()
+  (ensure-media-types-are-known
+   '(:application/octet-stream
+     :text/plain
+     :text/css
+     :text/html
+     :text/javascript)))
+
+(define-testcase ensure-important-image-media-types-are-known ()
+  (ensure-media-types-are-known '(:image/png :image/jpeg :image/svg+xml)))
 
 (define-testcase test-find-media-type-polymorphism ()
   (let ((media-type
-	  (webmachine:define-media-type "application/testsuite"
-	    :suffixes nil
+	  (webmachine:define-media-type :application/testsuite
+	    :reply-class 'webmachine:application-reply
 	    :description "A media type that represents a test purpose."))
 	(lookup-keys
 	  '("application/testsuite"
@@ -36,7 +49,9 @@
       (assert-eq media-type (webmachine:find-media-type lookup-key)))))
 
 (define-testcase testsuite-media-type ()
-  (ensure-important-mime-types-for-web-developers-are-known)
+  (ensure-repository-keys-are-keywords)
+  (ensure-important-media-types-for-web-developers-are-known)
+  (ensure-important-image-media-types-are-known)
   (test-find-media-type-polymorphism))
 
 ;;;; End of file `media-type.lisp'

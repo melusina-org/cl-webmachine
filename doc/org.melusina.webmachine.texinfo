@@ -118,6 +118,21 @@ Many accessors and slots can be used from the HUNCHENTOOT package.
 Many accessors and slots can be used from the HUNCHENTOOT package.
 
 @include include/class-org.melusina.webmachine-reply.texinfo
+@include include/class-org.melusina.webmachine-application-reply.texinfo
+@include include/class-org.melusina.webmachine-application-slash-octet-stream-reply.texinfo
+@include include/class-org.melusina.webmachine-audio-reply.texinfo
+@include include/class-org.melusina.webmachine-font-reply.texinfo
+@include include/class-org.melusina.webmachine-image-reply.texinfo
+@include include/class-org.melusina.webmachine-image-slash-jpeg-reply.texinfo
+@include include/class-org.melusina.webmachine-image-slash-png-reply.texinfo
+@include include/class-org.melusina.webmachine-image-slash-svg-plus-xml-reply.texinfo
+@include include/class-org.melusina.webmachine-model-reply.texinfo
+@include include/class-org.melusina.webmachine-text-reply.texinfo
+@include include/class-org.melusina.webmachine-text-slash-css-reply.texinfo
+@include include/class-org.melusina.webmachine-text-slash-javascript-reply.texinfo
+@include include/class-org.melusina.webmachine-text-slash-html-reply.texinfo
+@include include/class-org.melusina.webmachine-text-slash-plain-reply.texinfo
+@include include/class-org.melusina.webmachine-video-reply.texinfo
 
 
 @node Request Method, Media Type, Reply, Top

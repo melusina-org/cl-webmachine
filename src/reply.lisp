@@ -27,4 +27,55 @@ about an outgoing reply.  They are created automatically by
 Webmachine and can be accessed and modified by the corresponding
 handler."))
 
+
+;;;;
+;;;; Replies assocaited to discrete media types
+;;;;
+
+(defclass application-reply (reply) nil
+  (:documentation "The REPLY subclass for content of general type."))
+
+(defclass audio-reply (reply) nil
+  (:documentation "The REPLY subclass for audio content."))
+
+(defclass font-reply (reply) nil
+  (:documentation "The REPLY subclass for font or typeface content."))
+
+(defclass image-reply (reply) nil
+  (:documentation "The REPLY subclass for image content."))
+
+(defclass model-reply (reply) nil
+  (:documentation "The REPLY subclass for 3D model content."))
+
+(defclass text-reply (reply) nil
+  (:documentation "The REPLY subclass for text content."))
+
+(defclass video-reply (reply) nil
+  (:documentation "The REPLY subclass for video content."))
+
+(defclass application/octet-stream-reply (application-reply) nil
+  (:documentation "The REPLY subclass for application/octet-stream content."))
+
+(defclass text/css-reply (text-reply) nil
+  (:documentation "The REPLY subclass for text/css content."))
+
+(defclass text/html-reply (text-reply) nil
+  (:documentation "The REPLY subclass for text/html content."))
+
+(defclass text/javascript-reply (text-reply) nil
+  (:documentation "The REPLY subclass for text/javascript content."))
+
+(defclass text/plain-reply (text-reply) nil
+  (:documentation "The REPLY subclass for text/plain content."))
+
+(defclass image/jpeg-reply (image-reply) nil
+  (:documentation "The REPLY subclass for image/jpeg content."))
+
+(defclass image/png-reply (image-reply) nil
+  (:documentation "The REPLY subclass for image/png content."))
+
+(defclass image/svg+xml-reply (image-reply) nil
+  (:documentation "The REPLY subclass for image/svg+xml content."))
+
 ;;;; End of file `reply.lisp'
+
