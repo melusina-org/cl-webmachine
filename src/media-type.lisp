@@ -15,16 +15,18 @@
 
 (defclass media-type nil
   ((name
-    :initform (error "No media-type NAME.")
     :initarg :name
+    :reader media-type-name
+    :initform (error "No media-type NAME.")
     :documentation "A string representing the MEDIA-TYPE.")
    (suffixes
-    :initform nil
     :initarg :suffixes
+    :initform nil
     :documentation "A list of file name SUFFIXES typically used for files of that MEDIA-TYPE.")
    (description
-    :initform nil
     :initarg :description
+    :reader media-type-description
+    :initform nil
     :documentation
     "A description of the media-type. If present, this description can be inserted
 in automatically generated documents."))
@@ -52,14 +54,19 @@ When a media type corresponding to DESIGNATOR is found, this request
 method is returned, otherwise NIL is returned. The DESIGNATOR can be a string,
 a keyword, a request-method, or a symbol."
   (cond
-    ((or (stringp designator)
-         (keywordp designator))
+    ((stringp designator)
      (maphash (lambda (k v)
-                (when (string-equal (string k) (string designator))
+                (when (string-equal (string k) (string designator)
+				    :end2 (position #\; designator))
+                  (return-from find-media-type v)))
+              *media-type-repository*))
+    ((keywordp designator)
+     (maphash (lambda (k v)
+                (when (string-equal (string k) designator)
                   (return-from find-media-type v)))
               *media-type-repository*))
     ((media-type-p designator)
-     (find-media-type (slot-value designator 'name)))
+     designator)
     ((and designator (symbolp designator))
      (gethash designator *media-type-repository*))
     (t
@@ -76,6 +83,7 @@ Return T if there was such an entry, or NIL if not."
 (defun make-media-type (&rest initargs &key name suffixes description)
   "Make a media-type with the given NAME and ARGS."
   (declare (ignore suffixes description))
+  (check-type name string)
   (remove-media-type name)
   (apply #'make-instance 'media-type initargs))
 

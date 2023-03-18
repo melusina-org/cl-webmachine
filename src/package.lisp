@@ -52,9 +52,8 @@
    #:describe-request-methods
    ;; Repository of Media Types
    #:media-type
-   #:name
-   #:suffixes
-   #:description
+   #:media-type-name
+   #:media-type-description
    #:media-type-p
    #:make-media-type
    #:define-media-type

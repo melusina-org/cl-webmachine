@@ -23,7 +23,20 @@
     (loop :for important-mime-type :in important-mime-types
 	  :do (assert-t* (webmachine:find-media-type important-mime-type)))))
 
+(define-testcase test-find-media-type-polymorphism ()
+  (let ((media-type
+	  (webmachine:define-media-type "application/testsuite"
+	    :suffixes nil
+	    :description "A media type that represents a test purpose."))
+	(lookup-keys
+	  '("application/testsuite"
+	    "application/testsuite;q=0."
+	    :application/testsuite)))
+    (dolist (lookup-key lookup-keys)
+      (assert-eq media-type (webmachine:find-media-type lookup-key)))))
+
 (define-testcase testsuite-media-type ()
-  (ensure-important-mime-types-for-web-developers-are-known))
+  (ensure-important-mime-types-for-web-developers-are-known)
+  (test-find-media-type-polymorphism))
 
 ;;;; End of file `media-type.lisp'

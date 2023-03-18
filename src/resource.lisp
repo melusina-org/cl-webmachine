@@ -462,6 +462,7 @@ Default: (:identity)")
 (defun resource-handle-request (resource request reply)
   "Handle the REQUEST using RESOURCE and sending back the REPLY.
 This walks down the decision graph of the Webmachine."
+  (declare (optimize (debug 3) (safety 3)))
   (labels
       ((response ()
          (let ((external-format

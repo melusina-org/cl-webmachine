@@ -76,7 +76,7 @@
 This uses `DRAKMA:HTTP-REQUEST' to perform the request."
   (declare (ignore protocol method content content-type content-length
 		   range cookie-jar basic-authorization parameters
-		   external-format-out accept additional-headers real-host))
+		   external-format-out additional-headers real-host))
   (let ((drakma:*text-content-types*
           '(("text" . nil)
             ("application" . "json")))
@@ -182,39 +182,37 @@ reply than the last *HTTP-REPLY*.~%")
 
 
 (define-assertion assert-http-body (regexp &optional (reply *http-reply*))
-  :report (lambda (stream)
-            (format stream
 "The assertion (ASSERT-HTTP-BODY REGEXP) is true iff the body response
 in the last *HTTP-REPLY* matches the given REGEXP.
 
 The optional argument REPLY can be used to test the header of another
-reply than the last *HTTP-REPLY*.
-
-The regular expression used is
+reply than the last *HTTP-REPLY*."
+  :report (lambda (stream)
+            (format stream
+"~&~%  The regular expression used is
 
   ~S
 
-and the last response body is
+  and the last response body is
 
-  ~S~%" regexp (slot-value reply 'body)))
+  ~S~%~%" regexp (slot-value reply 'body)))
   (cl-ppcre:scan regexp (slot-value reply 'body)))
 
 (define-assertion assert-http-status (status &optional (reply *http-reply*))
-  :report (lambda (stream)
-            (format stream
 "The assertion (ASSERT-HTTP-STATUS STATUS) is true iff the status response
 in the last *HTTP-REPLY* equals the given STATUS or is in the list STATUS.
 
 The optional argument REPLY can be used to test the header of another
-reply than the last *HTTP-REPLY*.
-
-The status used is
+reply than the last *HTTP-REPLY*."
+  :report (lambda (stream)
+            (format stream
+"~&~%  The status used is
 
   ~S
 
-and the last response status is
+  and the last response status is
 
-  ~S~%" status  (slot-value reply 'status-code)))
+  ~S~%~%" status  (slot-value reply 'status-code)))
   (if (listp status)
       (position (slot-value reply 'status-code) status)
       (= (slot-value reply 'status-code) status)))
