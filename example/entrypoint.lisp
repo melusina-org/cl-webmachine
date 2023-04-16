@@ -23,8 +23,13 @@
 (defun start ()
   (server:start
    (list
-    (make-instance 'user-administration)
-    (make-instance 'user-resource))
+    (resource 'about)
+    (resource 'view-home)
+    (resource 'features)
+    (resource 'system-health)
+    (resource 'example.css)
+    (make-user-administration-resource)
+    (make-user-resource))
    :swank t))
 
 (defun stop ()

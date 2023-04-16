@@ -135,8 +135,7 @@
 ;;;; HTML Page
 ;;;;
 
-(hunchentoot:define-easy-handler (example.css :uri "/example.css") ()
-  (setf (hunchentoot:content-type*) "text/css")
+(define-constant-resource (example.css :uri "/example.css" :content-type :text/css)
   (css:css
    '((".icon-square"
       :display "inline-flex"
@@ -146,7 +145,6 @@
       :height "3rem"
       :font-size "1.5rem"
       :border-radius ".75rem"))))
-   
 
 (defmacro html-page ((&key title (lang "en") (mathjax nil) (chartjs nil) navigation)
 		     &body body)

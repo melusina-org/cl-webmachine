@@ -63,6 +63,7 @@
   ((:module "example"
     :components ((:file "package")
 		 (:file "utilities")
+		 (:file "resource")
 		 (:file "html")
 		 (:file "javascript")
 		 (:module "domain"

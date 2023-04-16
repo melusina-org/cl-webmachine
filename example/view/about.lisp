@@ -229,7 +229,12 @@
     '(("Homepage" .
        "https://www.quicklisp.org/beta/")))))
 
-(hunchentoot:define-easy-handler (about :uri "/about") ()
+
+;;;;
+;;;; About Resource
+;;;;
+
+(define-constant-resource (about :uri "/about" :content-type :text/html)
   (html-page (:title "About Example for Webmachine"
 	      :navigation "About")
     (html-page-title "About")

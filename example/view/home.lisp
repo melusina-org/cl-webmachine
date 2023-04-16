@@ -13,7 +13,7 @@
 
 (in-package #:org.melusina.webmachine/example)
 
-(hunchentoot:define-easy-handler (view-home :uri "/home") ()
+(define-constant-resource (view-home :uri "/home" :content-type :text/html)
   (html-page (:title "Home for Webmachine Example"
 	      :navigation "Home")
     (html-page-title "Webmachine")

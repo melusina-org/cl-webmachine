@@ -529,7 +529,7 @@
 					       (request webmachine:get-request)
 					       (reply webmachine:text/html-reply)
 					       response-body)
-  (declare (ignore instance))
+  (declare (ignore instance reply response-body))
   (webmachine:with-path-parameters (id) request
     (let ((user
 	    (find-user (parse-integer id))))
@@ -543,5 +543,16 @@
   (webmachine:with-path-parameters (id) request
     (delete-user (parse-integer id))
     (hunchentoot:redirect "/user")))
+
+
+;;;;
+;;;; API
+;;;;
+
+(defun make-user-administration-resource ()
+  (make-instance 'user-administration))
+
+(defun make-user-resource ()
+  (make-instance 'user-resource))
 
 ;;;; End of file `user.lisp'

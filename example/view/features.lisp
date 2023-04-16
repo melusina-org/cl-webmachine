@@ -85,7 +85,12 @@
 	 "The application needs the ability to trigger actions using buttons,"
 	 "without reloading the page, and monitor progress using a web socket."))))
 
-(hunchentoot:define-easy-handler (features :uri "/features") ()
+
+;;;;
+;;;; Features Resource
+;;;;
+
+(define-constant-resource (features :uri "/features" :content-type :text/html)
   (html-page (:title "Features Example for Webmachine"
 	      :navigation "Features")
     (html-page-title "Application Features")

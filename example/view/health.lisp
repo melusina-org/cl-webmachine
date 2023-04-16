@@ -17,7 +17,7 @@
   (html-page-section (:id "memory" :title "Memory")
     (:pre (room))))
 
-(hunchentoot:define-easy-handler (system-health :uri "/health") ()
+(define-constant-resource (system-health :uri "/health" :content-type :text/html)
   (html-page (:title "Health Example for Webmachine"
 	      :navigation "Health")
     (html-page-title "System Health")
