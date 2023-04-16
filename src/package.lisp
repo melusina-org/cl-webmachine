@@ -93,6 +93,8 @@
    #:resource-p
    #:find-resource
    #:remove-resource
+   #:resource-name
+   #:resource-path
    ;; HTTP Protocol Semantic of Resource Operations 
    #:resource-available-p
    #:resource-exists-p
@@ -116,6 +118,7 @@
    #:acceptor
    #:ssl-acceptor
    #:make-acceptor
+   #:resources
   ))
 
 (in-package #:org.melusina.webmachine)

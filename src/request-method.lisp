@@ -45,7 +45,9 @@ generated documents."))
   (string (slot-value instance 'identifier)))
 
 (defmethod print-object ((object request-method) stream)
-  (format stream "#<REQUEST-METHOD ~S>" (slot-value object 'identifier)))
+  (print-unreadable-object (object stream :type t)
+    (with-slots (identifier) object
+      (format stream "~S" identifier))))
 
 (defvar *request-method-repository* (make-hash-table)
   "A repository for request methods.

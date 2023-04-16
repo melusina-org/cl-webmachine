@@ -25,6 +25,7 @@
    #:*server-address*
    #:start
    #:stop
+   #:resource
    #:resources
    
    ;; HTML

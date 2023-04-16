@@ -37,7 +37,9 @@ in automatically generated documents."))
   (:documentation "This represents a MEDIA-TYPE."))
 
 (defmethod print-object ((object media-type) stream)
-  (format stream "#<MEDIA-TYPE ~S>" (slot-value object 'name)))
+  (print-unreadable-object (object stream :type t)
+    (with-slots (name) object
+      (format stream "~S" name))))
 
 (defvar *media-type-repository* (make-hash-table)
   "The table of all media-types.

@@ -41,7 +41,7 @@ quality. (This is a stable sort.)"
 	      '(:sequence :start-anchor
 		(:alternation "*" "compress" "br" "identity" "gzip" "deflate"))))))
 	(quality
-	  (ppcre:create-scanner 
+	  (ppcre:create-scanner
 	   '(:sequence
 	     :start-anchor
 	     ";q="
@@ -60,13 +60,13 @@ quality. (This is a stable sort.)"
 		     :for preference :in segment
 		     :do (setf next-accumulator (cons (cons preference quality)
 						      next-accumulator))
-		     :finally (return next-accumulator)))	     
+		     :finally (return next-accumulator)))
 	     (initial-state ()
 	       (valid-header :start 0 :end (length text)))
 	     (repetition (parser)
 	       (lambda (&rest state)
 		 (loop :for last-state = state :then next-state
-		       :for next-state = state :then (apply parser next-state)	
+		       :for next-state = state :then (apply parser next-state)
 		       :while next-state
 		       :finally (return last-state))))
 	     (sequence (&rest parsers)
@@ -210,6 +210,7 @@ parameter, or NIL."
 This NAME is used in logging artefacts and introspective
 presentations, to ease maintenance of the program.")
    (path
+    :reader resource-path
     :initarg :path
     :initform nil
     :documentation "The URI PATH where the resource is located.
@@ -218,6 +219,11 @@ the URI PATH and a keyword matches a non-empty string made of characters
 in the range [A-Za-z0-9_-] whose value shoud be bound to the parameter
 denoted by the keyword."))
   (:documentation "Resources with HTTP Protocol semantics."))
+
+(defmethod print-object ((object resource) stream)
+  (print-unreadable-object (object stream :type t)
+    (with-slots (name path) object
+      (format stream "~S :URI ~S" name path))))
 
 (defvar *resource-repository* (make-hash-table)
   "The table of all resources.

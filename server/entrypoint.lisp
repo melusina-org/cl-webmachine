@@ -39,7 +39,6 @@ We use an acceptor deriving from Hunchentoot to easily serve static content."))
 	      (create-bootstrap-dispatcher-and-handler)
 	      (create-chartjs-dispatcher-and-handler))))
 
-
 
 ;;;;
 ;;;; Start and Stop the Server
@@ -107,15 +106,35 @@ We use an acceptor deriving from Hunchentoot to easily serve static content."))
 ;;;; Resources
 ;;;;
 
+(defun resource (name)
+  "The resource named NAME from the running server."
+  (unless *service-acceptor*
+    (error "There is no service acceptor whose resources could be accessed."))
+  (find name (slot-value *service-acceptor* 'webmachine:resources)
+	:key #'webmachine:resource-name))
+
+(defun (setf resource) (new-value name)
+  (unless *service-acceptor*
+    (error "There is no service acceptor whose resources could be accessed."))
+  (with-slots ((resources webmachine:resources)) *service-acceptor*
+    (let ((old-value
+	    (resource name)))
+      (if old-value
+	  (setf resources
+		(substitute new-value old-value resources))
+	  (setf resources
+		(cons new-value resources)))))
+  new-value)
+
 (defun resources ()
   "The list of resources from the running server."
   (unless *service-acceptor*
     (error "There is no service acceptor whose resources could be accessed."))
-  (slot-value 'resources *service-acceptor*))
+  (slot-value *service-acceptor* 'webmachine:resources))
 
 (defun (setf resources) (resources)
   (unless *service-acceptor*
     (error "There is no service acceptor whose resources could be accessed."))
-  (setf (slot-value 'resources *service-acceptor*)  resources))
+  (setf (slot-value *service-acceptor* 'webmachine:resources)  resources))
 
 ;;;; End of file `entrypoint.lisp'
