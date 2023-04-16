@@ -88,11 +88,21 @@ We use an acceptor deriving from Hunchentoot to easily serve static content."))
 
 (defun start (resources &key (service t) (swank nil))
   "Start the server."
-  (when service
-    (update-service-dispatch-table)
-    (start-service resources))
-  (when swank
-    (start-swank)))
+  (flet ((accept-designated-resources ()
+	   (flet ((find-resource (designator)
+		    (let ((resource (webmachine:find-resource designator)))
+		      (unless resource
+			(error "Cannot find resource ~A" designator))
+		      resource)))
+	     (setf resources
+		   (loop :for designator :in resources
+			 :collect (find-resource designator))))))
+    (accept-designated-resources)
+    (when service
+      (update-service-dispatch-table)
+      (start-service resources))
+    (when swank
+      (start-swank))))
 
 (defun stop (&key (service t) (swank t))
   "Stop the server."

@@ -36,7 +36,9 @@
 		:resources (list ,@resources)
 		:server-name (testsuite-acceptor/server-name)
 		:port (testsuite-acceptor/random-unprivileged-port)
-		:address "127.0.0.1")))
+		:address "127.0.0.1"))
+	   (webmachine::*resource-repository*
+	     (make-hash-table)))
        (hunchentoot:start *testsuite-acceptor*)
        (unwind-protect (progn ,@body)
 	 (hunchentoot:stop *testsuite-acceptor*))))

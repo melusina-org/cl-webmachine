@@ -836,11 +836,10 @@ This must be implemented by resources using `HMAC-AUHTORIZATION'."))
 ;;;; Example 
 ;;;;
 
-(defclass private-constant-resource (org.melusina.webmachine/signature:verify-hmac-authorization-trait constant-resource)
+(defclass private-constant-resource (org.melusina.webmachine/signature:verify-hmac-authorization-trait webmachine:constant-resource)
   ((signature-key-repository
-    :initarg :signature-key-repository))
-  (:default-initargs
-   :signature-key-repository nil))
+    :initarg :signature-key-repository
+    :initform nil)))
 
 (defmethod org.melusina.webmachine/signature:find-signature-key ((resource private-constant-resource) identity)
   (cdr (assoc identity (slot-value resource 'signature-key-repository) :test #'string=)))

@@ -23,11 +23,11 @@
 (defun start ()
   (server:start
    (list
-    (resource 'about)
-    (resource 'view-home)
-    (resource 'features)
-    (resource 'system-health)
-    (resource 'example.css)
+    'about
+    'view-home
+    'features
+    'system-health
+    'example.css
     (make-user-index-resource)
     (make-user-detail-resource))
    :swank t))

@@ -13,6 +13,10 @@
 
 (in-package #:org.melusina.webmachine/example)
 
+(defun hunchentoot-session-p ()
+  (and (boundp 'hunchentoot:*session*)
+       hunchentoot:*session*))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (setf
    (who:html-mode) :html5
@@ -66,7 +70,7 @@
 	      "Logout"))))
 
 (defun html-login-or-logout ()
-  (if hunchentoot:*session*
+  (if (hunchentoot-session-p)
       (html-logout)
       (html-login-sign-up-combo)))
 
@@ -202,7 +206,7 @@
     (forbidden-page)))
 
 (defmacro with-valid-session (&body body-forms)
-  `(if hunchentoot:*session*
+  `(if (hunchentoot-session-p)
        (progn ,@body-forms)
        (reply-forbidden)))
 

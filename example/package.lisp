@@ -18,6 +18,9 @@
    (#:css #:cl-css)
    (#:webmachine #:org.melusina.webmachine)
    (#:server #:org.melusina.webmachine/server))
+  (:import-from
+   #:org.melusina.webmachine
+   #:define-constant-resource)
   (:export
    #:functional-state-javascript
    #:start

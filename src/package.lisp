@@ -116,6 +116,10 @@
    #:resource-charsets-provided
    #:resource-flexible-negotiation-p
    #:write-resource-response
+   ;; Constant Resources
+   #:constant-resource
+   #:make-constant-resource
+   #:define-constant-resource
    ;; Acceptor
    #:acceptor
    #:ssl-acceptor

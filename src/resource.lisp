@@ -568,8 +568,11 @@ Default: (:identity)")
 
 (defgeneric write-resource-response (resource request reply response-body)
   (:documentation "Write the RESOURCE response for REQUEST to RESPONSE-BODY.
-The response must be represented as sepcificed by the content type of
-the REPLY.")
+The response must be represented as specificed by the content type of
+the REPLY.
+
+When this method returns a STRING, the string is used as a response
+and written to RESPONSE-BODY by Webmachine.")
   (:method (resource request reply response-body)
     (declare (ignore resource request response-body))
     (http-error 500)))
@@ -609,8 +612,8 @@ This walks down the decision graph of the Webmachine."
                     external-format))
 	     (let ((string-response-body
 		     (write-resource-response resource request reply response-body)))
-	       (if (stringp string-response-body)
-		   (write-string string-response-body response-body))
+	       (when (stringp string-response-body)
+		 (write-string string-response-body response-body))
 	       (finish-output response-body)))))
        (specialize-request ()
 	 "Specialize REQUEST according to its request method."
