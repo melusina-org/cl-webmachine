@@ -137,45 +137,46 @@ This uses `DRAKMA:HTTP-REQUEST' to perform the request."
         (format stream "~%The header ~A is not set." header-name))))
 
 (define-assertion assert-http-header-undefined (header-name &optional (reply *http-reply*))
+  "The assertion (ASSERT-HTTP-HEADER-UNDEFINED HEADER-NAME) is true iff
+the header with the name HEADER-NAME is undefined in the last *HTTP-REPLY*."
   :report (lambda (stream)
             (format stream
-"The assertion (ASSERT-HTTP-HEADER-UNDEFINED HEADER-NAME) is true iff
-the header with the name HEADER-NAME is undefined in the last *HTTP-REPLY*.
-
-The optional argument REPLY can be used to test the header of another reply than
+"The optional argument REPLY can be used to test the header of another reply than
 the last *HTTP-REPLY*.~%")
             (write-header-value stream header-name reply))
   (not (header-value header-name reply)))
 
 
 (define-assertion assert-http-header-match (header-name regexp &optional (reply *http-reply*))
-  :report (lambda (stream)
-            (format stream
-"The assertion (ASSERT-HTTP-HEADER-MATCH HEADER-NAME REGEXP) is true iff
+  "The assertion (ASSERT-HTTP-HEADER-MATCH HEADER-NAME REGEXP) is true iff
 the header with the name HEADER-NAME is defined in the last *HTTP-REPLY* and
 matches the given REGEXP.
 
 The optional argument REPLY can be used to test the header of another reply than
-the last *HTTP-REPLY*.
-
-The regular expression used is
+the last *HTTP-REPLY*."
+  :report (lambda (stream)
+            (format stream "The regular expression used is
 
   ~S~%" regexp)
             (write-header-value stream header-name reply))
   (header-match (header-value header-name reply) regexp))
 
 (define-assertion assert-http-header-charset (charset &optional (reply *http-reply*))
-  :report (lambda (stream)
-            (format stream
-"The assertion (ASSERT-HTTP-HEADER-CHARSET CHARSET) is true iff the
+  "The assertion (ASSERT-HTTP-HEADER-CHARSET CHARSET) is true iff the
 header with the name Content-Type is defined in the last *HTTP-REPLY*
 and features a charset declaration validating CHARSET.
 
 Currently, only the :utf-8 charset is supported.
 
 The optional argument REPLY can be used to test the header of another
-reply than the last *HTTP-REPLY*.~%")
-            (write-header-value stream :content-type reply))
+reply than the last *HTTP-REPLY*."
+  :report (lambda (stream)
+            (format stream "The expected CHARSET is
+
+  ~S
+
+and the CHARSET received in the last response is~%~%  " charset)
+	    (write-header-value stream :content-type reply))
   (let ((regexp (ecase charset
                   (:utf-8 ";\\s*charset=(?i)utf-8"))))
     (header-match (header-value :content-type reply) regexp)))
