@@ -120,7 +120,11 @@
   :description "Development tools for the Common Lisp Webmachine"
   :author "Michaël Le Barbier"
   :license "MIT License"
-  :depends-on (#:org.melusina.atelier)
+  :depends-on (#:org.melusina.atelier
+	       #:org.melusina.webmachine
+	       #:org.melusina.webmachine/example
+	       #:org.melusina.webmachine/server
+	       #:org.melusina.webmachine/testsuite)
   :components
   ((:module "libexec/lisp"
     :components ((:file "development")))))

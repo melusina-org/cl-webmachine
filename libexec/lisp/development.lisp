@@ -15,12 +15,23 @@
   (:use #:cl)
   (:local-nicknames
    (#:atelier #:org.melusina.atelier)
+   (#:webmachine #:org.melusina.webmachine)
+   (#:testsuite #:org.melusina.webmachine/testsuite)
+   (#:server #:org.melusina.webmachine/server)
    (#:example #:org.melusina.webmachine/example))
   (:export
    #:lint
    #:reload))
 
 (in-package #:org.melusina.webmachine/development)
+
+(defun system-relative-pathname (pathname)
+  (flet ((system-source-directory ()
+	   (asdf:system-source-directory (string-downcase (package-name *package*)))))
+    (merge-pathnames pathname (system-source-directory))))
+
+(defun system-relative-pathnames (&rest pathnames)
+  (mapcar #'system-relative-pathname pathnames))
 
 (defparameter *parameter-bindings*
   '((:copyright-holder . "Michaël Le Barbier")
@@ -30,26 +41,26 @@
     (:project-description . "HTTP Semantic Awareness on top of Hunchentoot")
     (:project-long-description .
 	 #.(concatenate 'string
-	    "Webmachine is an application layer that adds HTTP semantic awareness "
-	    "on top of the excellent bit-pushing and HTTP syntax-management provided "
-	    "by Hunchentoot, and provides a simple and clean way to connect that "
-	    "to your application's behavior."
-
-	    "The design is inspired by the mythic Webmachine of Erlang "
-	    "and honours it with that name."))
-    (:homepage . "https://github.com/melusina-org/cl-webmachine")
+	    " Webmachine is an application layer that adds HTTP semantic awareness"
+	    " on top of the excellent bit-pushing and HTTP syntax-management provided"
+	    " by Hunchentoot, and provides a simple and clean way to connect that"
+	    " to your application's behavior."
+	    " Its design is inspired by the mythic Webmachine of Erlang"
+	    " and honours it with that name."))
+    (:homepage ."https://github.com/melusina-org/cl-webmachine")
     (:license . :MIT)))
 
 (defun lint ()
   (let ((atelier:*parameter-bindings* *parameter-bindings*))
     (atelier:lint
-     #p"src"
-     #p"testsuite"
-     #p"server"
-     #p"example"
-     #p"development"
-     #p"libexec/lisp/setup.lisp"
-     #p"libexec/lisp/development.lisp")))
+     (system-relative-pathnames
+      #p"src"
+      #p"testsuite"
+      #p"server"
+      #p"example"
+      #p"development"
+      #p"libexec/lisp/setup.lisp"
+      #p"libexec/lisp/development.lisp"))))
 
 (defun reload ()
   (ql:quickload '("org.melusina.atelier"
