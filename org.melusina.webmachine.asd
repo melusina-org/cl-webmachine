@@ -35,6 +35,47 @@
                  (:file "resource")
 		 (:file "acceptor")))))
 
+(asdf:defsystem #:org.melusina.webmachine/server
+  :description "A Webmachine server"
+  :author "Michaël Le Barbier"
+  :license "MIT License"
+  :depends-on (#:cl-css
+	       #:cl-who
+	       #:hunchentoot
+	       #:org.melusina.webmachine
+	       #:parenscript
+	       #:swank)
+  :components
+  ((:module "server"
+    :components ((:file "package")
+		 (:file "asset")
+		 (:file "html")
+		 (:file "entrypoint")))))
+
+(asdf:defsystem #:org.melusina.webmachine/example
+  :description "A Webmachine example"
+  :author "Michaël Le Barbier"
+  :license "MIT License"
+  :depends-on (#:unix-opts
+	       #:org.melusina.webmachine/server)
+  :components
+  ((:module "example"
+    :components ((:file "package")
+		 (:file "utilities")
+		 (:file "html")
+		 (:module "domain"
+		  :components ((:file "user")))
+		 (:module "view"
+		  :components ((:file "about")
+			       (:file "features")
+			       (:file "health")
+			       (:file "home")
+			       (:file "login")
+			       (:file "logout")
+			       (:file "sign-up")
+			       (:file "user")))
+		 (:file "entrypoint")))))
+
 (asdf:defsystem #:org.melusina.webmachine/testsuite
   :description "Testsuite for the Common Lisp Webmachine"
   :author "Michaël Le Barbier"
@@ -59,5 +100,14 @@
                  (:file "path")
                  (:file "resource")
 		 (:file "entrypoint")))))
+
+(asdf:defsystem #:org.melusina.webmachine/development
+  :description "Development tools for the Common Lisp Webmachine"
+  :author "Michaël Le Barbier"
+  :license "MIT License"
+  :depends-on (#:org.melusina.atelier)
+  :components
+  ((:module "libexec/lisp"
+    :components ((:file "development")))))
 
 ;;;; End of file `org.melusina.webmachine.asd'
