@@ -187,19 +187,19 @@ for testing."))
 (defmethod resource-valid-content-type-p and ((resource constant-resource) request)
   (slot-value resource 'valid-content-type-p))
 
-(defmethod resource-options append ((resource constant-resource))
+(defmethod resource-options append ((resource constant-resource) request)
   (slot-value resource 'options))
 
-(defmethod resource-content-types-provided ((resource constant-resource))
+(defmethod resource-content-types-provided ((resource constant-resource) request)
   (slot-value resource 'content-types-provided))
 
-(defmethod resource-languages-provided ((resource constant-resource))
+(defmethod resource-languages-provided ((resource constant-resource) request)
   (slot-value resource 'languages-provided))
 
-(defmethod resource-charsets-provided ((resource constant-resource))
+(defmethod resource-charsets-provided ((resource constant-resource) request)
   (slot-value resource 'charsets-provided))
 
-(defmethod resource-encodings-provided ((resource constant-resource))
+(defmethod resource-encodings-provided ((resource constant-resource) request)
   (slot-value resource 'encodings-provided))
 
 (defmethod resource-flexible-negotiation-p ((resource constant-resource) request)

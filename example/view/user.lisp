@@ -286,10 +286,10 @@ A controller attribute is one of
 	 (maximal-content-length 4096))
     (and content-length (> content-length maximal-content-length))))
 
-(defmethod webmachine:resource-content-types-provided ((instance user-index))
+(defmethod webmachine:resource-content-types-provided ((instance user-index) request)
   '(:text/html))
 
-(defmethod webmachine:resource-languages-provided ((instance user-index))
+(defmethod webmachine:resource-languages-provided ((instance user-index) request)
   '(:en-US))
 
 (defmethod webmachine:resource-allowed-methods ((instance user-index))
@@ -467,10 +467,10 @@ A controller attribute is one of
 (defmethod webmachine:resource-flexible-negotiation-p ((instance user-detail) request)
   t)
 
-(defmethod webmachine:resource-content-types-provided ((instance user-detail))
+(defmethod webmachine:resource-content-types-provided ((instance user-detail) request)
   '(:text/html))
 
-(defmethod webmachine:resource-languages-provided ((instance user-detail))
+(defmethod webmachine:resource-languages-provided ((instance user-detail) request)
   '(:en-US))
 
 (defmethod webmachine:resource-allowed-methods ((instance user-detail))
@@ -493,7 +493,7 @@ A controller attribute is one of
   (webmachine:with-path-parameters (id) request
     (let ((user
 	    (find-user (parse-integer id))))
-      (view-user-html user))))
+      (view-user-detail user))))
 
 (defmethod webmachine:write-resource-response ((instance user-detail)
 					       (request webmachine:delete-request)
@@ -509,11 +509,9 @@ A controller attribute is one of
 ;;;;
 
 (defun make-user-index-resource ()
-  (setf (resource 'user-index)
-	(make-instance 'user-index)))
+  (make-instance 'user-index))
 
 (defun make-user-detail-resource ()
-  (setf (resource 'user-detail)
-	(make-instance 'user-detail)))
+  (make-instance 'user-detail))
 
 ;;;; End of file `user.lisp'

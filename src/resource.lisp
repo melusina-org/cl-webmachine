@@ -503,7 +503,7 @@ Generic resources accept all requests.")
   (:method-combination and)
   (:method and (resource request) t))
 
-(defgeneric resource-options (resource)
+(defgeneric resource-options (resource request)
   (:documentation
    "Headers to put in the answer of an :OPTIONS request.
 If the OPTIONS method is supported and is used, the return value of
@@ -515,9 +515,9 @@ compound resources support all methods supported by participating
 resources. When several values for the same header are provided,
 only the header value defined by the most specialised class is used.")
   (:method-combination append)
-  (:method append (resource) nil))
+  (:method append (resource request) nil))
 
-(defgeneric resource-languages-provided (resource)
+(defgeneric resource-languages-provided (resource request)
   (:documentation
    "Content negociation for accepted languages.
 This should return or list of languages, where each language is
@@ -525,9 +525,9 @@ identified by a string.
 
 When a request has invalid accept language headers, the resource answers
 that request with a 406 Not Acceptable. (V3D5)")
-  (:method (resource) nil))
+  (:method (resource request) nil))
 
-(defgeneric resource-content-types-provided (resource)
+(defgeneric resource-content-types-provided (resource request)
   (:documentation
    "Content negociation for accepted content types.
 
@@ -540,9 +540,9 @@ Not Acceptable will be sent.
 
 When a second value is supplied, this value is used as the result of
 a failed negotiation instead of returning 406.")
-  (:method (resource) nil))
+  (:method (resource request) nil))
 
-(defgeneric resource-charsets-provided (resource)
+(defgeneric resource-charsets-provided (resource request)
   (:documentation
    "Content negociation for accepted charsets.
 This should return a list of charsets or external formats designators.
@@ -552,9 +552,9 @@ not appear as a first element in any of the return tuples, then a 406
 Not Acceptable will be sent.
 
 Default: (:utf-8)")
-  (:method (resource) '(:utf-8)))
+  (:method (resource request) '(:utf-8)))
 
-(defgeneric resource-encodings-provided (resource)
+(defgeneric resource-encodings-provided (resource request)
   (:documentation
    "Content negociation for accepted encodings.
 This should return a list of encoding designators.  Content negotiation
@@ -564,7 +564,16 @@ a first element in any of the return tuples, then a 406 Not Acceptable
 will be sent.
 
 Default: (:identity)")
-  (:method (resource) '(:identity)))
+  (:method (resource request) '(:identity)))
+
+(defgeneric resource-flexible-negotiation-p (resource request)
+  (:documentation
+   "Predicate recognising flexible negotiation situations.
+When a flexible negotiation situation is recognised, the Webmachine
+chooses to requalify client's preferences instead to avoid returning
+a 406 Not Acceptable status code. Instead it uses the first option
+provided as if it were accpetable by the client.")
+  (:method (resource request) nil))
 
 (defgeneric write-resource-response (resource request reply response-body)
   (:documentation "Write the RESOURCE response for REQUEST to RESPONSE-BODY.
@@ -576,15 +585,6 @@ and written to RESPONSE-BODY by Webmachine.")
   (:method (resource request reply response-body)
     (declare (ignore resource request response-body))
     (http-error 500)))
-
-(defgeneric resource-flexible-negotiation-p (resource request)
-  (:documentation
-   "Predicate recognising flexible negotiation situations.
-When a flexible negotiation situation is recognised, the Webmachine
-chooses to requalify client's preferences instead to avoid returning
-a 406 Not Acceptable status code. Instead it uses the first option
-provided as if it were accpetable by the client.")
-  (:method (resource request) nil))
 
 
 ;;;;
@@ -648,9 +648,9 @@ This walks down the decision graph of the Webmachine."
 		 (or content-type
 		     (negotiate-accept
 		      (parse-header-accept-* :media-type (hunchentoot:header-in :accept request))
-		      (resource-content-types-provided resource))
+		      (resource-content-types-provided resource request))
 		     (and (resource-flexible-negotiation-p resource request)
-			  (first (resource-content-types-provided resource))))))
+			  (first (resource-content-types-provided resource request))))))
 	   (when chosen
 	     (setf chosen
 		   (find-media-type chosen))
@@ -663,9 +663,9 @@ This walks down the decision graph of the Webmachine."
                       (parse-header-accept-*
 		       :language
 		       (hunchentoot:header-in :accept-language request))
-                      (resource-languages-provided resource))
+                      (resource-languages-provided resource request))
 		     (and (resource-flexible-negotiation-p resource request)
-			  (first (resource-languages-provided resource))))))
+			  (first (resource-languages-provided resource request))))))
            (when language
              (setf (slot-value request 'language) language)
 	     (setf (hunchentoot:header-out :content-language reply)
@@ -677,9 +677,9 @@ This walks down the decision graph of the Webmachine."
                       (parse-header-accept-*
 		       :charset
 		       (hunchentoot:header-in :accept-charset request))
-                      (resource-charsets-provided resource))
+                      (resource-charsets-provided resource request))
 		     (and (resource-flexible-negotiation-p resource request)
-			  (first (resource-charsets-provided resource))))))
+			  (first (resource-charsets-provided resource request))))))
            (setf (slot-value request 'charset) chosen)))
        (choose-encoding ()
 	 (let ((encoding
@@ -687,9 +687,9 @@ This walks down the decision graph of the Webmachine."
                       (parse-header-accept-*
 		       :encoding
 		       (hunchentoot:header-in :accept-encoding request))
-                      (resource-encodings-provided resource))
+                      (resource-encodings-provided resource request))
 		     (and (resource-flexible-negotiation-p resource request)
-			  (first (resource-encodings-provided resource))))))
+			  (first (resource-encodings-provided resource request))))))
 	   (when encoding
              (setf (slot-value request 'encoding) encoding)
 	     (setf (hunchentoot:header-out :encoding reply)
@@ -754,13 +754,13 @@ This walks down the decision graph of the Webmachine."
        (v3b3 ()
          (if (eq :options (hunchentoot:request-method request))
              (progn
-	       (set-header-out (resource-options resource) reply)
+	       (set-header-out (resource-options resource request) reply)
                (setf (hunchentoot:return-code* reply) 204)
                nil)
              (v3c3)))
        (v3c3 ()
          (let ((content-types-provided
-                 (resource-content-types-provided resource))
+                 (resource-content-types-provided resource request))
                (content-types-accepted
                  (hunchentoot:header-in :accept request)))
            (cond
@@ -785,7 +785,7 @@ This walks down the decision graph of the Webmachine."
              (halt 406)))
        (v3e5 ()
          (let ((charsets-provided
-                 (resource-charsets-provided resource))
+                 (resource-charsets-provided resource request))
                (charsets-accepted
                  (hunchentoot:header-in :accept-charset request)))
            (if charsets-accepted
