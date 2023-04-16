@@ -183,6 +183,7 @@ Many accessors and slots can be used from the HUNCHENTOOT package.
 @chapter HTTP Protocol Semantic of Resource Operations
 
 @include include/fun-org.melusina.webmachine-resource-available-p.texinfo
+@include include/fun-org.melusina.webmachine-resource-exists-p.texinfo
 @include include/fun-org.melusina.webmachine-resource-known-methods.texinfo
 @include include/fun-org.melusina.webmachine-resource-uri-too-long-p.texinfo
 @include include/fun-org.melusina.webmachine-resource-payload-too-large-p.texinfo

@@ -197,6 +197,20 @@ Generic resources are always available.")
   (:method-combination and)
   (:method and (resource) t))
 
+(defgeneric resource-exists-p (resource request)
+  (:documentation
+   "This predicate recognises if a resource exists.
+When a resource does not exist, requests it handles are answered
+with a 404 Not found status code, in most cases. (V3G7)
+
+The method combination for this generic function is AND, so that
+compound resources only exists if every participating resource
+exist.
+
+Generic resources always exist.")
+  (:method-combination and)
+  (:method and (resource request) t))
+
 (defgeneric resource-known-methods (resource)
   (:documentation
    "The list of HTTP methods supported by the resource.
@@ -651,7 +665,9 @@ This walks down the decision graph of the Webmachine."
              (v3g7)
              (halt 406)))
        (v3g7 ()
-         (response)))
+	 (if (resource-exists-p resource request)
+             (response)
+	     (halt 404))))
     (v3b13)))
 
 ;;;; End of file `resource.lisp'

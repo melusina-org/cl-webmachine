@@ -92,6 +92,7 @@
    #:remove-resource
    ;; HTTP Protocol Semantic of Resource Operations 
    #:resource-available-p
+   #:resource-exists-p
    #:resource-known-methods
    #:resource-uri-too-long-p
    #:resource-payload-too-large-p
