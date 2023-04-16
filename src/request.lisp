@@ -91,4 +91,51 @@ WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/TRACE"))
   (:documentation "The PATCH method is used to apply partial modifications to a resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH"))
 
+
+
+;;;;
+;;;; WITH-PATH-PARAMETERS
+;;;;
+
+(defun parameter-value (name request)
+  "The value associate to NAME in request.
+When NAME has no associated value, a status code 400 Bad Request is
+returned."
+  (or (cdr (assoc name (slot-value request 'path-parameters)
+		  :test #'string-equal))
+      (http-error 400)))
+
+(defmacro with-path-parameters (parameters request &body body)
+  "Run BODY in an environment where PARAMETERS are bound to REQUEST.
+The PARAMETERS are either a Symbol, which then associated to a parameter
+of the same name, or a list with two elements, a Symbol and a parameter name."
+  (alexandria:once-only (request)
+    (flet ((well-formed-p (parameter-entry)
+	     (and (listp parameter-entry)
+		  (= 2 (length parameter-entry))
+		  (symbolp (first parameter-entry))
+		  (keywordp (second parameter-entry))))
+	   (error-malformed (parameter-entry)
+	     (error #.(concatenate
+		       'string
+		       "Malformed parameter entry: ~S should be a symbol "
+		       "or (variable-name parameter-name)")
+		    parameter-entry))
+	   (binding (parameter-entry)
+	     (let ((variable-name (first parameter-entry))
+		   (parameter-name (second parameter-entry)))
+	       `(,variable-name (parameter-value ,parameter-name ,request)))))
+      (let* ((parameters
+	       (loop :for parameter-entry :in parameters
+		     :collect (cond
+				((symbolp parameter-entry)
+				 (list parameter-entry (symbol-name parameter-entry)))
+				((well-formed-p parameter-entry)
+				 parameter-entry)
+				(t
+				 (error-malformed parameter-entry)))))
+	     (bindings
+	       (mapcar #'binding parameters)))
+	`(let ,bindings ,@body)))))
+
 ;;;; End of file `request.lisp'

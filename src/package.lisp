@@ -35,6 +35,7 @@
    #:language
    #:charset
    #:encoding
+   #:with-path-parameters
    #:get-request
    #:head-request
    #:post-request
