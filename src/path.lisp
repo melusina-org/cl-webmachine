@@ -127,7 +127,7 @@ If the URI does not match PATH, then NIL is returned."
 	     (and match-start
 		  (eql match-start 0)
 		  (eql match-end (length uri))))
-	   (extract-parameter-values (reg-starts reg-ends)
+	   (parameter-values (reg-starts reg-ends)
 	     (loop :for parameter-name :in (path-parameters actual-path)
 		   :for reg-start :across reg-starts
 		   :for reg-end :across reg-ends
@@ -136,6 +136,6 @@ If the URI does not match PATH, then NIL is returned."
       (multiple-value-bind (match-start match-end reg-starts reg-ends)
           (ppcre:scan (path-regex actual-path) uri)
 	(when (full-match-p match-start match-end)
-	  (values t (extract-parameter-values reg-starts reg-ends)))))))
+	  (values t (parameter-values reg-starts reg-ends)))))))
 
 ;;;; End of file `path.lisp'

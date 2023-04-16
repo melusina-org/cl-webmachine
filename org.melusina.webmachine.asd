@@ -34,7 +34,18 @@
                  (:file "path")
                  (:file "resource")
                  (:file "constant-resource")
+                 (:file "directory-resource")
+                 (:file "file-resource")
 		 (:file "acceptor")))))
+
+(asdf:defsystem #:org.melusina.webmachine/asset
+  :description "Definition of Webmachine Assets"
+  :author "Michaël Le Barbier"
+  :license "MIT License"
+  :depends-on (#:org.melusina.webmachine)
+  :components
+  ((:module "src"
+    :components ((:file "asset")))))
 
 (asdf:defsystem #:org.melusina.webmachine/server
   :description "A Webmachine server"
@@ -49,7 +60,6 @@
   :components
   ((:module "server"
     :components ((:file "package")
-		 (:file "asset")
 		 (:file "html")
 		 (:file "entrypoint")))))
 
@@ -59,6 +69,7 @@
   :license "MIT License"
   :depends-on (#:unix-opts
 	       #:shasht
+	       #:org.melusina.webmachine/asset
 	       #:org.melusina.webmachine/server)
   :components
   ((:module "example"

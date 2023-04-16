@@ -17,6 +17,7 @@
    (#:who #:cl-who)
    (#:css #:cl-css)
    (#:webmachine #:org.melusina.webmachine)
+   (#:asset #:org.melusina.webmachine/asset)
    (#:server #:org.melusina.webmachine/server))
   (:import-from
    #:org.melusina.webmachine

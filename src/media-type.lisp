@@ -191,6 +191,10 @@ If a server doesn't recognize the .css suffix for CSS files, it may send
 them with text/plain or application/octet-stream MIME types. If so, they
 won't be recognized as CSS by most browsers and will be ignored.")
 
+(define-media-type :font/woff
+  :reply-class 'font/woff
+  :description "The type for serving font files encoded in the WOFF format.")
+
 (define-media-type :text/html
   :reply-class 'text/html-reply
   :description "All HTML content should be served with this type.")

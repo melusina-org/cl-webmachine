@@ -19,7 +19,6 @@
 	     (:name "User" :email "joe@melusina.invalid" :password "*" :administrator nil)))
     (apply #'add-user user-spec)))
 
-
 (defun start ()
   (server:start
    (list
@@ -29,7 +28,11 @@
     'system-health
     'example.css
     (make-user-index-resource)
-    (make-user-detail-resource))
+    (make-user-detail-resource)
+    (asset:make-bootstrap-icons-resource)
+    (asset:make-bootstrap-resource)
+    (asset:make-mathjax-resource)
+    (asset:make-chartjs-resource))
    :swank t))
 
 (defun stop ()

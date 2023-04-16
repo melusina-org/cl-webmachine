@@ -31,14 +31,6 @@
   (:documentation "Webmachine example acceptor.
 We use an acceptor deriving from Hunchentoot to easily serve static content."))
 
-(defun update-service-dispatch-table ()
-  "Make a dispatch table of the service."
-  (setf hunchentoot:*dispatch-table*
-	(list #'hunchentoot:dispatch-easy-handlers
-	      (create-mathjax-dispatcher-and-handler)
-	      (create-bootstrap-dispatcher-and-handler)
-	      (create-chartjs-dispatcher-and-handler))))
-
 
 ;;;;
 ;;;; Start and Stop the Server
@@ -99,7 +91,6 @@ We use an acceptor deriving from Hunchentoot to easily serve static content."))
 			 :collect (find-resource designator))))))
     (accept-designated-resources)
     (when service
-      (update-service-dispatch-table)
       (start-service resources))
     (when swank
       (start-swank))))

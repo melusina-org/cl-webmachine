@@ -96,21 +96,14 @@
   ;; using HANDLER-BIND unstead of HANDLER-CASE. That's however slightly
   ;; more technical than HANDLER-CASE because the mix of interactive restarts,
   ;; multi-threads environment and how Hunchentoot itself handles errors.
-  (flet ((resource-handle-request-p (resource request)
-           (multiple-value-bind (handle-p path-parameters)
-               (match-path (slot-value resource 'path)
-                           (slot-value request 'hunchentoot:script-name))
-             (when handle-p
-               (setf (slot-value request 'path-parameters) path-parameters)
-               (values t)))))
-    (handler-case
-        (loop :for resource :in (slot-value instance 'resources)
-              :when (resource-handle-request-p resource request)
-              :return (resource-handle-request resource request hunchentoot::*reply*)
-              :finally (http-error 404))
-      (http-condition (c)
-        (setf (hunchentoot:return-code*) (http-condition-status-code c))
-        (setf (hunchentoot:content-type*) "text/plain; charset=utf-8")
-	(hunchentoot:abort-request-handler (http-condition-short-description c))))))
+  (handler-case
+      (loop :for resource :in (slot-value instance 'resources)
+            :when (resource-handle-request-p resource request)
+            :return (resource-handle-request resource request hunchentoot::*reply*)
+            :finally (http-error 404))
+    (http-condition (c)
+      (setf (hunchentoot:return-code*) (http-condition-status-code c))
+      (setf (hunchentoot:content-type*) "text/plain; charset=utf-8")
+      (hunchentoot:abort-request-handler (http-condition-short-description c)))))
 
 ;;;; End of file `acceptor.lisp'

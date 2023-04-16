@@ -286,6 +286,22 @@ The DESIGNATOR can be a string, a keyword, a resource, or a symbol."
 
 
 ;;;
+;;; Acceptor Customisation
+;;;
+
+(defgeneric resource-handle-request-p (resource request)
+  (:documentation
+   "This predicate recognises if RESOURCE wants to handle REQUEST.")
+  (:method ((instance resource) request)
+    (multiple-value-bind (handle-p path-parameters)
+        (match-path (slot-value instance 'path)
+                    (slot-value request 'hunchentoot:script-name))
+      (when handle-p
+        (setf (slot-value request 'path-parameters) path-parameters)
+        (values t)))))
+
+
+;;;
 ;;; Webmachine Logic Customisation
 ;;;
 
@@ -669,7 +685,8 @@ This walks down the decision graph of the Webmachine."
            (when language
              (setf (slot-value request 'language) language)
 	     (setf (hunchentoot:header-out :content-language reply)
-		   (language-name language)))))
+		   (language-name language)))
+	   (or language (resource-flexible-negotiation-p resource request))))
        (choose-charset (&optional charset)
 	 (let ((chosen
 		 (or charset

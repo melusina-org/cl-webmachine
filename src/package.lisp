@@ -97,7 +97,8 @@
    #:remove-resource
    #:resource-name
    #:resource-path
-   ;; HTTP Protocol Semantic of Resource Operations 
+   ;; HTTP Protocol Semantic of Resource Operations
+   #:resource-handle-request-p
    #:resource-available-p
    #:resource-exists-p
    #:resource-known-methods
@@ -116,10 +117,16 @@
    #:resource-charsets-provided
    #:resource-flexible-negotiation-p
    #:write-resource-response
-   ;; Constant Resources
+   ;; Constant Resource
    #:constant-resource
    #:make-constant-resource
    #:define-constant-resource
+   ;; Directory Resource
+   #:directory-resource
+   #:make-directory-resource
+   ;; Directory Resource
+   #:file-resource
+   #:make-file-resource
    ;; Acceptor
    #:acceptor
    #:ssl-acceptor

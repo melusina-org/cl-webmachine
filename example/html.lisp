@@ -13,6 +13,68 @@
 
 (in-package #:org.melusina.webmachine/example)
 
+
+;;;;
+;;;; MathJax Configuration
+;;;;
+
+(defun write-mathjax-configuration (configuration)
+  "Write MathJax configuration in HTML header.
+Supported values for CONFIGURATION are: NIL, T
+and :TEX-CHTML."
+  (unless configuration
+    (return-from write-mathjax-configuration))
+  (who:with-html-output (*standard-output*)
+    (:script
+     :type "text/javascript"
+     :id "MathJax-configuration"
+     "
+MathJax = {
+  tex: {
+    packages: {'[+]': ['configmacros']},
+    macros: {
+      R: \"\\\\mathbf{R}\"
+    }
+  }
+}
+")
+    (case configuration
+      ((t :tex-chtml)
+       (who:htm
+	(:script :type "text/javascript" :id "MathJax-script"
+		 :src "/mathjax/tex-chtml.js"
+		 :async t))))))
+
+
+;;;;
+;;;; ChartJS Configuration
+;;;;
+
+(defun write-chartjs-configuration (configuration)
+  "Write ChartJS configuration in header.
+The possible CONFIGURATION values are NIL, T, :CDN."
+  (unless configuration
+    (return-from write-chartjs-configuration))
+  (case configuration
+    (:cdn
+     (who:with-html-output (*standard-output*)
+       (:script
+	:src #.(concatenate
+		'string
+		"https://cdnjs.cloudflare.com/ajax/libs"
+		"/Chart.js/4.2.0/chart.umd.min.js")
+	:integrity #.(concatenate
+		      'string
+		      "sha512-0gS26t/01v98xlf2QF4QS1k32/YHWfFs8HfBM/j7g"
+		      "S97Tr8WxpJqoiDND8r1HgFwGGYRs0aRt33EY8xE91ZgJw==")
+	:crossorigin "anonymous"
+	:referrerpolicy "no-referrer")))
+    (t
+     (who:with-html-output (*standard-output*)
+       (:script
+	:src "/contrib/chart.umd.min.js")))))
+
+
 (defun hunchentoot-session-p ()
   (and (boundp 'hunchentoot:*session*)
        hunchentoot:*session*))
@@ -164,8 +226,8 @@
        (:link
 	:href "/example.css"
 	:rel "stylesheet")
-       (server::write-mathjax-configuration ,mathjax)
-       (server::write-chartjs-configuration ,chartjs))
+       (write-mathjax-configuration ,mathjax)
+       (write-chartjs-configuration ,chartjs))
       (:body
        (html-navigation-bar ,navigation)
        (:div :class "container"
