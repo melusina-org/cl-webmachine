@@ -65,6 +65,7 @@
    #:image/svg+xml-reply
    ;; Repository of Request Methods
    #:request-method
+   #:request-method-name
    #:name
    #:destructive-p
    #:description

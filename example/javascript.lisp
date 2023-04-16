@@ -28,9 +28,11 @@ downcase strings."
 	(defparameter *debug* t
 	  "Flag governing debugging application.")
 	(defun error (details)
-	  (chain console (log details)))
+	  (chain console (log details))
+	  details)
 	(defun debug (details)
-	  (chain console (debug details)))
+	  (chain console (debug details))
+	  details)
 	;; DOM Element
 	(defun find-dom-element (element)
 	  (if (stringp element)

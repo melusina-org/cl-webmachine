@@ -79,6 +79,16 @@
 			       (:file "user")))
 		 (:file "entrypoint")))))
 
+(asdf:defsystem #:org.melusina.webmachine/signature
+  :description "A Webmachine example"
+  :author "Michaël Le Barbier"
+  :license "MIT License"
+  :depends-on (#:ironclad
+	       #:org.melusina.webmachine/example)
+  :components
+  ((:module "example"
+    :components ((:file "signature")))))
+
 (asdf:defsystem #:org.melusina.webmachine/testsuite
   :description "Testsuite for the Common Lisp Webmachine"
   :author "Michaël Le Barbier"
@@ -87,7 +97,9 @@
 	       #:cl-ppcre
 	       #:drakma
 	       #:org.melusina.confidence
-	       #:org.melusina.webmachine)
+	       #:org.melusina.webmachine
+	       #:org.melusina.webmachine/signature
+	       #:org.melusina.webmachine/example)
   :components
   ((:module "testsuite"
     :components ((:file "package")

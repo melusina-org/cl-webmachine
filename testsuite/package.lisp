@@ -15,6 +15,8 @@
   (:use #:common-lisp)
   (:local-nicknames
    (#:webmachine #:org.melusina.webmachine)
+   (#:example #:org.melusina.webmachine/example)
+   (#:signature #:org.melusina.webmachine/signature)
    (#:confidence #:org.melusina.confidence))
   (:import-from
    #:alexandria
