@@ -18,57 +18,146 @@
 ;;;; Header Analysis
 ;;;;
 
-(defparameter *header-accept-regex*
-  (let* ((media-type-word
-	   '(:alternation
-	     (:greedy-repetition 1 nil :word-char-class)
-	     (:char-class #\*)))
-	 (media-type
-	   `(:sequence ,media-type-word #\/ ,media-type-word))
-	 (language
-	   `(:sequence
-	     (:char-class (:range #\a #\z)) (:char-class (:range #\a #\z))
-	     (:greedy-repetition
-	      0 1
-	      (:sequence #\_ (:char-class (:range #\A #\Z)) (:char-class (:range #\A #\Z))))))
-	 (charset
-	   `(:alternation "UTF-8" "utf-8"))
-	 (encoding
-	   "identity")
-	 (accept
-	   `(:register
-	     (:alternation ,media-type ,language ,charset ,encoding)))
-	 (quality
-	  `(:sequence ";q="
-		      (:register
-		       (:alternation
-			(:sequence
-			 #\0 (:char-class #\.) (:char-class (:range #\0 #\9))
-			 (:greedy-repetition 0 1 (:char-class (:range #\0 #\9))))
-			#\1
-			"1.0" )))))
-    `(:sequence :start-anchor ,accept (:greedy-repetition 0 1 ,quality) :end-anchor)))
- 
-	   
-
-(defun parse-header-accept-* (text)
+(defun parse-header-accept-* (scanner text)
   "Parse an :ACCEPT-* header.
 The response is an alist of (DESIGNATOR . QUALITY) sorted by decreasing
 quality. (This is a stable sort.)"
-  (labels ((read-accept-preference (word)
-             (ppcre:register-groups-bind (designator quality)
-                 (*header-accept-regex* word)
-               (cons designator
-                     (parse-number:parse-real-number
-		      (or quality "1.0")))))
-	   (split-accept-header (text)
-	     (loop :for word :in (ppcre:split ",\\s*" text)
-		   :collect (read-accept-preference word))))
-    (let ((accept
-	    (split-accept-header text)))
-      (setf accept (delete-if-not #'car accept))
-      (setf accept (stable-sort accept #'> :key #'cdr))
-      accept)))
+  (let ((comma
+	  (ppcre:create-scanner "^ *, *"))
+	(space
+	  (ppcre:create-scanner "^ *"))
+	(preference
+	  (ecase scanner
+	    (:media-type
+	     (ppcre:create-scanner "^(?:\\*|\\w+)(?:/\\*|/[a-zA-Z0-9+-]+)?"))
+	    (:language
+	     (ppcre:create-scanner "^[a-z][a-z](?:-[A-Z][A-Z])?"))
+	    (:charset
+	     (ppcre:create-scanner
+	      '(:sequence :start-anchor
+		(:alternation "UTF-8" "utf-8"))))
+	    (:encoding
+	     (ppcre:create-scanner
+	      '(:sequence :start-anchor
+		(:alternation "*" "compress" "br" "identity" "gzip" "deflate"))))))
+	(quality
+	  (ppcre:create-scanner 
+	   '(:sequence
+	     :start-anchor
+	     ";q="
+	     (:register
+	      (:alternation #\1 "1.0"
+	       (:sequence
+		#\0
+		(:char-class #\.)
+		(:char-class (:range #\0 #\9))
+		(:greedy-repetition 0 1 (:char-class (:range #\0 #\9)))))))))
+	(garbage
+	  (ppcre:create-scanner "^;v=[A-Za-z0-9]+")))
+    (labels ((commit-segment (segment quality accumulator)
+	       (loop :with next-accumulator = accumulator
+		     :with quality = (parse-number:parse-number quality)
+		     :for preference :in segment
+		     :do (setf next-accumulator (cons (cons preference quality)
+						      next-accumulator))
+		     :finally (return next-accumulator)))	     
+	     (initial-state ()
+	       (valid-header :start 0 :end (length text)))
+	     (repetition (parser)
+	       (lambda (&rest state)
+		 (loop :for last-state = state :then next-state
+		       :for next-state = state :then (apply parser next-state)	
+		       :while next-state
+		       :finally (return last-state))))
+	     (sequence (&rest parsers)
+	       (lambda (&rest state)
+		 (loop :with next-state = state
+		       :while next-state
+		       :for parser :in parsers
+		       :do (setf next-state (apply parser next-state))
+		       :finally (return next-state))))
+	     #+deleted-unused-function
+	     (alternation (&rest parsers)
+	       (lambda (&rest state)
+		 (loop :with next-state = nil
+		       :for parser :in parsers
+		       :do (setf next-state (apply parser state))
+		       :until next-state
+		       :finally (return next-state))))
+	     (enumeration (term separator)
+	       (sequence term (repetition (sequence separator term))))
+	     (one-preference (&rest state &key start end segment accumulator)
+	       (declare (ignore state))
+	       (multiple-value-bind (match-start match-end)
+		   (ppcre:scan preference text :start start :end end)
+		 (when match-start
+		   (list :start match-end :end end
+			 :segment (cons (subseq text match-start match-end) segment)
+			 :accumulator accumulator))))
+	     (comma (&rest state &key start end segment accumulator)
+	       (declare (ignore state))
+	       (multiple-value-bind (match-start match-end)
+		   (ppcre:scan comma text :start start :end end)
+		 (when match-start
+		   (list :start match-end :end end
+			 :segment segment
+			 :accumulator accumulator))))
+	     (space (&rest state &key start end segment accumulator)
+	       (declare (ignore state))
+	       (multiple-value-bind (match-start match-end)
+		   (ppcre:scan space text :start start :end end)
+		 (when match-start
+		   (list :start match-end :end end
+			 :segment segment
+			 :accumulator accumulator))))
+	     (quality (&rest state &key start end segment accumulator)
+	       (declare (ignore state))
+	       (multiple-value-bind (match-start match-end register-start register-end)
+		   (ppcre:scan quality text :start start :end end)
+		 (when match-start
+		   (list :start match-end :end end
+			 :segment nil
+			 :accumulator (commit-segment
+				       segment
+				       (subseq text
+					       (aref register-start 0)
+					       (aref register-end 0))
+				       accumulator)))))
+	     (maybe-quality (&rest state &key start end segment accumulator)
+	       (or (apply #'quality state)
+		   (list :start start :end end
+			 :segment nil
+			 :accumulator (commit-segment
+				       segment
+				       "0"
+				       accumulator))))
+	     (garbage (&rest state &key start end segment accumulator)
+	       (declare (ignore state))
+	       (multiple-value-bind (match-start match-end)
+		   (ppcre:scan garbage text :start start :end end)
+		 (when match-start
+		   (list :start match-end :end end
+			 :segment segment
+			 :accumulator accumulator))))
+	     (several-preferences (&rest state &key start end segment accumulator)
+	       (declare (ignore start end segment accumulator))
+	       (apply (enumeration #'one-preference #'comma) state))
+	     (preference (&rest state &key start end segment accumulator)
+	       (declare (ignore start end segment accumulator))
+	       (apply (sequence #'several-preferences
+				(repetition #'garbage)
+				#'maybe-quality)
+		      state))
+	     (valid-header (&rest state &key start end segment accumulator)
+	       (declare (ignore start end segment accumulator))
+	       (apply (sequence #'space
+				(enumeration #'preference #'comma)
+				#'space)
+		      state)))
+      (destructuring-bind (&key start end segment accumulator) (initial-state)
+	(declare (ignore segment))
+	(when (and start end (>= start end))
+	  (stable-sort (nreverse accumulator) #'>= :key #'cdr))))))
 
 (defun negotiate-accept (accept offer)
   "Negotiate the :ACCEPT content type.
@@ -429,17 +518,11 @@ negotiation is driven by this return value.
 
 For example, if a client request includes an :ACCEPT header with a value
 that does not appear in the list of content types provided, then a 406
-Not Acceptable will be sent.")
+Not Acceptable will be sent.
+
+When a second value is supplied, this value is used as the result of
+a failed negotiation instead of returning 406.")
   (:method (resource) nil))
-
-
-(defgeneric write-resource-response (resource request reply response-body)
-  (:documentation "Write the RESOURCE response for REQUEST to RESPONSE-BODY.
-The response must be represented as sepcificed by the content type of
-the REPLY.")
-  (:method (resource request reply response-body)
-    (declare (ignore resource request response-body))
-    (http-error 500)))
 
 (defgeneric resource-charsets-provided (resource)
   (:documentation
@@ -464,6 +547,23 @@ will be sent.
 
 Default: (:identity)")
   (:method (resource) '(:identity)))
+
+(defgeneric write-resource-response (resource request reply response-body)
+  (:documentation "Write the RESOURCE response for REQUEST to RESPONSE-BODY.
+The response must be represented as sepcificed by the content type of
+the REPLY.")
+  (:method (resource request reply response-body)
+    (declare (ignore resource request response-body))
+    (http-error 500)))
+
+(defgeneric resource-flexible-negotiation-p (resource request)
+  (:documentation
+   "Predicate recognising flexible negotiation situations.
+When a flexible negotiation situation is recognised, the Webmachine
+chooses to requalify client's preferences instead to avoid returning
+a 406 Not Acceptable status code. Instead it uses the first option
+provided as if it were accpetable by the client.")
+  (:method (resource request) nil))
 
 
 ;;;;
@@ -523,8 +623,10 @@ This walks down the decision graph of the Webmachine."
 	 (let ((chosen
 		 (or content-type
 		     (negotiate-accept
-		      (parse-header-accept-* (hunchentoot:header-in :accept request))
-		      (resource-content-types-provided resource)))))
+		      (parse-header-accept-* :media-type (hunchentoot:header-in :accept request))
+		      (resource-content-types-provided resource))
+		     (and (resource-flexible-negotiation-p resource request)
+			  (first (resource-content-types-provided resource))))))
 	   (when chosen
 	     (setf chosen
 		   (find-media-type chosen))
@@ -533,27 +635,49 @@ This walks down the decision graph of the Webmachine."
 	   chosen))
        (choose-language ()
 	 (let ((language
-                 (negotiate-accept-language
-                  (parse-header-accept-* (hunchentoot:header-in :accept-language request))
-                  (resource-languages-provided resource))))
+                 (or (negotiate-accept-language
+                      (parse-header-accept-*
+		       :language
+		       (hunchentoot:header-in :accept-language request))
+                      (resource-languages-provided resource))
+		     (and (resource-flexible-negotiation-p resource request)
+			  (first (resource-languages-provided resource))))))
            (when language
-             (setf (slot-value request 'language) language))))
+             (setf (slot-value request 'language) language)
+	     (setf (hunchentoot:header-out :content-language reply)
+		   (language-name language)))))
        (choose-charset (&optional charset)
 	 (let ((chosen
 		 (or charset
                      (negotiate-accept-charset
-                      (parse-header-accept-* (hunchentoot:header-in :accept-charset request))
-                      (resource-charsets-provided resource)))))
+                      (parse-header-accept-*
+		       :charset
+		       (hunchentoot:header-in :accept-charset request))
+                      (resource-charsets-provided resource))
+		     (and (resource-flexible-negotiation-p resource request)
+			  (first (resource-charsets-provided resource))))))
            (setf (slot-value request 'charset) chosen)))
        (choose-encoding ()
 	 (let ((encoding
-                 (negotiate-accept-encoding
-                  (parse-header-accept-* (hunchentoot:header-in :accept-encoding request))
-                  (resource-encodings-provided resource))))
+                 (or (negotiate-accept-encoding
+                      (parse-header-accept-*
+		       :encoding
+		       (hunchentoot:header-in :accept-encoding request))
+                      (resource-encodings-provided resource))
+		     (and (resource-flexible-negotiation-p resource request)
+			  (first (resource-encodings-provided resource))))))
 	   (when encoding
              (setf (slot-value request 'encoding) encoding)
 	     (setf (hunchentoot:header-out :encoding reply)
 		   (string-downcase encoding)))))
+       (language-name (language)
+	 (let* ((identifier
+		  (string-downcase (string language)))
+		(position-dash
+		  (position #\- identifier)))
+	   (if position-dash
+	       (string-upcase identifier :start position-dash)
+	       identifier)))
        (v3b13 ()
          (if (resource-available-p resource)
 	     (v3b12)

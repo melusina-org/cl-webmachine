@@ -15,6 +15,63 @@
 
 
 ;;;;
+;;;; Header Analysis
+;;;;
+
+(define-testcase testsuite-parse-header-accept-* ()
+  "Validate the parse `PARSE-HEADER-ACEEPT-*' function."
+  (assert-equal '(("text/*" . 0.6))
+		(webmachine::parse-header-accept-* :media-type "text/*;q=0.6"))
+  (assert-equal '(("text/plain" . 0))
+		(webmachine::parse-header-accept-* :media-type "text/plain"))
+  (assert-equal '(("text/html" . 1) ("application/json" . 0.8) ("text/*" . 0.6))
+		(webmachine::parse-header-accept-*
+		 :media-type
+		 "text/html;q=1, text/*;q=0.6, application/json;q=0.8"))
+  (assert-equal '(("text/html" . 0.9)
+		  ("application/xhtml+xml" . 0.9)
+		  ("application/xml" . 0.9)
+		  ("*/*" . 0.8))
+		(webmachine::parse-header-accept-*
+		 :media-type "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"))
+  (assert-equal '(("application/signed-exchange" . 0.9)
+		  ("text/html" . 0.9)
+		  ("application/xhtml+xml" . 0.9)
+		  ("application/xml" . 0.9)
+		  ("image/avif" . 0.8)
+		  ("image/webp" . 0.8)
+		  ("image/apng" . 0.8)
+		  ("*/*" . 0.8))
+		(webmachine::parse-header-accept-*
+		 :media-type
+		 #.(concatenate
+		    'string
+		    "text/html,application/xhtml+xml,application/xml;q=0.9,"
+		    "image/avif,image/webp,image/apng,*/*;q=0.8,"
+		    "application/signed-exchange;v=b3;q=0.9")))
+  (assert-equal '(("fr-FR" . 1) ("fr" . 1) ("en" . 0.6))
+		(webmachine::parse-header-accept-*
+		 :language
+		 "fr-FR,fr;q=1, en;q=0.6"))
+  (assert-equal '(("en-GB" . 0.9) ("en" . 0.9))
+		(webmachine::parse-header-accept-*
+		 :language
+		 "en-GB,en;q=0.9"))
+  (assert-equal '(("utf-8" . 0))
+		(webmachine::parse-header-accept-*
+		 :charset
+		 "utf-8"))
+  (assert-equal '(("deflate" . 1) ("identity" . 0.1))
+		(webmachine::parse-header-accept-*
+		 :encoding
+		 "deflate;q=1, identity;q=0.1"))
+  (assert-equal '(("gzip" . 0) ("deflate" . 0))
+		(webmachine::parse-header-accept-*
+		 :encoding
+		 "gzip, deflate")))
+
+
+;;;;
 ;;;; TESTSUITE-RESOURCE-HANDLE-REQUEST
 ;;;;
 
@@ -94,11 +151,32 @@
     :initform '(:identity)
     :documentation
     "The return value of the `WEBMACHINE:RESOURCE-ENCODINGS-PROVIDED' generic function.")
+   (flexible-negotiation-p
+    :initarg :flexible-negotiation-p
+    :initform nil
+    :documentation
+    "The return value of the `WEBMACHINE:RESOURCE-FLEXIBLE-NEGOTIATION-P' generic function.")
    (response
     :initarg :response
     :initform '((:text/html . "<html>A constant resource!</html>"))
     :documentation
     "An alist mapping CONTENT-TYPES to RESPONSE-BODY."))
+  (:default-initargs
+   :uri-too-long-p nil
+   :payload-too-large-p nil
+   :allowed-methods '(:get :head)
+   :valid-request-p t
+   :authorized-p t
+   :forbidden-p nil
+   :valid-content-headers-p t
+   :valid-content-type-p t
+   :options t
+   :content-types-provided '(:text/html)
+   :languages-provided '(:en-US)
+   :charsets-provided '(:utf-8)
+   :encodings-provided '(:identity)
+   :flexible-negotiation-p nil
+   :response '((:text/html . "<html>A constant resource!</html>")))
   (:documentation
    "A resource on which generic functions return a fixed value, corresponding
 to initialisation parameters of the instance. Such a resource is useful
@@ -181,6 +259,9 @@ for testing."))
 
 (defmethod webmachine:resource-encodings-provided ((resource constant-resource))
   (slot-value resource 'encodings-provided))
+
+(defmethod webmachine:resource-flexible-negotiation-p ((resource constant-resource) request)
+  (slot-value resource 'flexible-negotiation-p))
 
 (define-testcase test-v3b13 ()
   (with-testsuite-acceptor
@@ -365,9 +446,10 @@ for testing."))
                       :path "/test/v3d5"
                       :name 'test/v3d5
                       :languages-provided '("en")))
-    (with-http-reply ("/test/v3d5" :additional-headers '(("accept-language" . "fr_FR;q=1, en;q=0.6")))
+    (with-http-reply ("/test/v3d5" :additional-headers '(("accept-language" . "fr-FR,fr;q=1, en;q=0.6")))
       (assert-http-status 200)
       (assert-http-header-match :content-type "text/html.*")
+      (assert-http-header-match :content-language "en")
       (assert-http-body "<html>A constant resource!</html>"))))
 
 (define-testcase test-v3e6 ()
@@ -408,7 +490,7 @@ for testing."))
     (with-http-reply ("/test/v3f7" :accept "text/html"
 				   :additional-headers
 				   '(("accept-encoding" .
-				      "invalid-encoding;q=1, identity;q=0.1")))
+				      "deflate;q=1, identity;q=0.1")))
       (assert-http-status 200)
       (assert-http-header-match :encoding "identity")
       (assert-http-body "<html>A constant resource!</html>"))))
@@ -433,49 +515,178 @@ for testing."))
 
 
 ;;;;
-;;;; TEST-RESOURCE-HELLO
+;;;; TEST-COMPATIBILITY-WITH-COMMON-BROWSERS
 ;;;;
 
-(define-testcase test-resource-hello ()
+(defclass test-compatibility-style (constant-resource) nil
+  (:default-initargs
+   :path "/compatibility.css"
+   :content-types-provided '(:text/css)
+   :language-provided '(:en-US)
+   :flexible-negotiation-p t
+   :response "html { font-family: monospace; }"))
+
+(defclass test-compatibility-document (constant-resource) nil
+  (:default-initargs
+   :path "/compatibility.html"
+   :content-types-provided '(:text/html)
+   :language-provided '(:en-US)
+   :flexible-negotiation-p t
+   :response "<!DOCTYPE html>
+<html>
+  <head>
+    <link rel=\"stylesheet\" href=\"/compatibility.css\">
+    <script src =\"/compatibility.js\"></script>
+  </head>
+  <body>
+    <h1>My First Heading</h1>
+    <p>My first paragraph.</p>
+  </body>
+</html>"))
+
+(defclass test-compatibility-script (constant-resource) nil
+  (:default-initargs
+   :path "/compatibility.js"
+   :content-types-provided '(:text/javascript)
+   :language-provided '(:en-US)
+   :flexible-negotiation-p t
+   :response "var a = 1"))
+
+(define-testcase test-compatibility-of-request (uri accept headers body)
+  "Test that URI is succesfully retrieved and the returned body matches BODY."
   (with-testsuite-acceptor
-      ((make-instance 'test-resource-hello
-                      :name 'hello
-                      :path "/hello/:who"))
-    (with-http-reply ("/" :accept "text/plain")
-      (assert-http-status 404)
-      (assert-http-header-charset :utf-8)
-      (assert-http-header-match :server "Webmachine"))
-    (with-http-reply ("/hello/world" :accept "text/html")
+      ((make-instance 'test-compatibility-style :name 'style)
+       (make-instance 'test-compatibility-document :name 'document)
+       (make-instance 'test-compatibility-script :name 'script))
+    (with-http-reply (uri :accept accept :additional-headers headers)
       (assert-http-status 200)
-      (assert-http-header-charset :utf-8)
-      (assert-http-header-match :server "Webmachine")
-      (assert-http-body "<html>Hello, world!</html>"))
-    (with-http-reply ("/hello/world" :accept "text/plain")
-      (assert-http-status 200)
-      (assert-http-header-charset :utf-8)
-      (assert-http-header-match :server "Webmachine")
-      (assert-http-body "Hello!"))))
+      (assert-http-header-match :encoding "identity")
+      (assert-http-header-match :content-language "en-US")
+      (assert-http-body body))))
 
-(defclass test-resource-hello (webmachine:resource) nil)
+(define-testcase test-compatbility-with-safari-16.3 ()
+  (let ((additional-headers
+	  '(("Upgrade-Insecure-Requests" . "1")
+	    ("Host" . "localhost:8000")
+	    ("User-Agent" .
+	     #.(concatenate 'string
+		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+		"AppleWebKit/605.1.15 (KHTML, like Gecko) "
+		"Version/16.3 Safari/605.1.15"))
+	    ("Accept-Language" . "en-GB,en;q=0.9")
+	    ("Accept-Encoding" . "gzip, deflate")
+	    ("Connection" . "keep-alive"))))
+    (test-compatibility-of-request
+     "/compatibility.html"
+     "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+     additional-headers
+     ".*<h1>My First Heading</h1>.*")
+    (test-compatibility-of-request
+     "/compatibility.css"
+     "text/css,*/*;q=0.1"
+     additional-headers
+     ".*font-family: monospace.*")
+    (test-compatibility-of-request
+     "/compatibility.js"
+     "*/*"
+     additional-headers "var a")))
 
-(defmethod webmachine:resource-content-types-provided ((instance test-resource-hello))
-  (declare (ignore instance))
-  '(:text/html :text/plain))
+(define-testcase test-compatibility-with-chrome-107.0.5304.110 ()
+  (let ((additional-headers
+	  `(("Accept-Encoding" . "gzip, deflate, br")
+	    ("Accept-Language" . "en-GB,en-US;q=0.9,en;q=0.8")
+	    ("Cache-Control" . "no-cache")
+	    ("Connection" . "keep-alive")
+	    ("Host" . "localhost:8000")
+	    ("Pragma" . "no-cache")
+	    ("Upgrade-Insecure-Requests" . "1")
+	    ("User-Agent" .
+              #.(concatenate 'string
+	       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+	       "AppleWebKit/537.36 (KHTML, like Gecko) "
+	       "Chrome/107.0.0.0 Safari/537.36"))
+	    ("sec-ch-ua" .
+	     "\"Google Chrome\";v=\"107\", \"Chromium\";v=\"107\", \"Not=A?Brand\";v=\"24\"")
+	    ("sec-ch-ua-mobile" . "?0")
+	    ("sec-ch-ua-platform" . "\"macOS\""))))
+    (test-compatibility-of-request
+     "/compatibility.html"
+     #.(concatenate
+	'string
+	"text/html,application/xhtml+xml,a,pplication/xml;q=0.9,"
+	"image/avif,image/webp,image/apng,*/*;q=0.8,"
+	"application/signed-exchange;v=b3;q=0.9")
+     (append additional-headers
+	     '(("Sec-Fetch-Dest" . "document")
+	       ("Sec-Fetch-Mode" . "navigate")
+	       ("Sec-Fetch-Site" . "none")
+	       ("Sec-Fetch-User" . "?1")))
+     ".*<h1>My First Heading</h1>.*")
+    (test-compatibility-of-request
+     "/compatibility.css"
+     "text/css,*/*;q=0.1"
+     (append additional-headers
+	     '(("Sec-Fetch-Dest" . "style")
+	       ("Sec-Fetch-Mode" . "no-cors")
+	       ("Sec-Fetch-Site" . "same-origin")))
+     ".*font-family: monospace.*")
+    (test-compatibility-of-request
+     "/compatibility.js"
+     "*/*"
+     (append additional-headers
+	     '(("Sec-Fetch-Dest" . "script")
+	       ("Sec-Fetch-Mode" . "no-cors")
+	       ("Sec-Fetch-Site" . "same-origin")))
+     "var a")))
 
-(defmethod webmachine:resource-charsets-provided ((instance test-resource-hello))
-  '(:utf-8))
+(define-testcase test-compatibility-with-firefox-111.0 ()
+  (let ((additional-headers
+	  `(("Accept-Encoding" . "gzip, deflate, br")
+	    ("Accept-Language" . "en-US,en;q=0.5")
+	    ("Cache-Control" . "no-cache")
+	    ("Connection" . "keep-alive")
+	    ("Host" . "localhost:8000")
+	    ("Pragma" . "no-cache")
+	    ("Upgrade-Insecure-Requests" . "1")
+	    ("User-Agent" .
+	      #.(concatenate
+		 'string
+		 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) "
+		 "Gecko/20100101 Firefox/111.0")))))
+    (test-compatibility-of-request
+     "/compatibility.html"
+     #.(concatenate
+	'string
+	"text/html,application/xhtml+xml,application/xml;q=0.9,"
+	"image/avif,image/webp,*/*;q=0.8")
+     (append additional-headers
+	     '(("Sec-Fetch-Dest" . "document")
+	       ("Sec-Fetch-Mode" . "navigate")
+	       ("Sec-Fetch-Site" . "cross-site")))
+     ".*<h1>My First Heading</h1>.*")
+    (test-compatibility-of-request
+     "/compatibility.css"
+     "text/css,*/*;q=0.1"
+     (append additional-headers
+	     '(("Referer" . "http://localhost:8000/compatibility.html")
+	       ("Sec-Fetch-Dest" . "style")
+	       ("Sec-Fetch-Mode" . "no-cors")
+	       ("Sec-Fetch-Site" . "same-origin")))
+     ".*font-family: monospace.*")
+    (test-compatibility-of-request
+     "/compatibility.js"
+     "*/*"
+     (append additional-headers
+	     '(("Referer" . "http://localhost:8000/compatibility.html")
+	       ("Sec-Fetch-Dest" . "script")
+	       ("Sec-Fetch-Mode" . "no-cors")
+	       ("Sec-Fetch-Site" . "same-origin")))
+     "var a")))
 
-(defmethod webmachine:write-resource-response ((resource test-resource-hello)
-					       (request webmachine:get-request)
-					       (reply webmachine:text/html-reply)
-					       response-body)
-  (format response-body "<html>Hello, world!</html>"))
-
-(defmethod webmachine:write-resource-response ((resource test-resource-hello)
-					       (request webmachine:get-request)
-					       (reply webmachine:text/plain-reply)
-					       response-body)
-  (format response-body "Hello!"))
+(define-testcase testsuite-compatibility-with-common-browsers ()
+  (test-compatbility-with-safari-16.3)
+  (test-compatibility-with-chrome-107.0.5304.110)
+  (test-compatibility-with-firefox-111.0))
 
 
 ;;;;
@@ -483,7 +694,8 @@ for testing."))
 ;;;;
 
 (define-testcase testsuite-resource ()
+  (testsuite-parse-header-accept-*)
   (testsuite-resource-handle-request)
-  (test-resource-hello))
+  (testsuite-compatibility-with-common-browsers))
 
 ;;;; End of file `resource.lisp'

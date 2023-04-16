@@ -109,6 +109,7 @@
    #:resource-languages-provided
    #:resource-encodings-provided
    #:resource-charsets-provided
+   #:resource-flexible-negotiation-p
    #:write-resource-response
    ;; Acceptor
    #:acceptor
