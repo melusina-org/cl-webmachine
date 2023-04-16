@@ -91,6 +91,7 @@
    #:reply-media-type
    ;; Repository of Web Resources
    #:resource
+   #:resources
    #:resource-p
    #:find-resource
    #:remove-resource

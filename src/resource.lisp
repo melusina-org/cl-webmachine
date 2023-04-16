@@ -228,49 +228,61 @@ denoted by the keyword."))
 (defvar *resource-repository* (make-hash-table)
   "The table of all resources.
 When a resource is defined, it is added to this table, using
-the function symbol as the key.")
+the NAME as the key.")
 
-(defun resource-p (thing)
+(defmethod initialize-instance :after ((instance resource) &rest initargs &key &allow-other-keys)
+  (declare (ignore initargs))
+  (setf (gethash (resource-name instance) *resource-repository*) instance))
+
+(defun resource-p (object)
   "Predicate recognising resources."
-  (typep thing 'resource))
+  (typep object 'resource))
 
-(defun find-resource (designator &key filter)
+(defun find-resource (designator)
   "Find a resource whose name matches DESIGNATOR.
-The DESIGNATOR can be a string, a keyword, a resource, or a symbol.
-
-The argument FILTER can be set to a predicate that the found resource
-must satisfy."
+The DESIGNATOR can be a string, a keyword, a resource, or a symbol."
   (cond
+    ((resource-p designator)
+     designator)
     ((or (stringp designator)
          (keywordp designator))
-     (flet ((name-equal-p (key designator)
-	      (string-equal (string key) (string designator)))
-	    (filter-p (resource)
-	      (if filter
-		  (funcall filter resource)
-		  t)))
-       (maphash (lambda (key resource)
-                  (when (and (name-equal-p key designator)
-			     (filter-p resource))
-                    (return-from find-resource resource)))
-		*resource-repository*)))
-    ((resource-p designator)
-     (find-resource (resource-name designator) :filter filter))
-    ((and designator (symbolp designator))
-     (let ((probe
-	     (gethash designator *resource-repository*)))
-       (when (or (not filter)
-                 (funcall filter probe))
-         probe)))
+     (flet ((search-resource (key resource)
+	      (when (string-equal (string key) (string designator))
+		(return-from find-resource resource))))
+       (maphash #'search-resource *resource-repository*)))
+    ((symbolp designator)
+     (gethash designator *resource-repository*))
     (t
      (error "~A is not a resource designator." designator))))
 
 (defun remove-resource (designator)
   "Remove a resource from resource repository."
-  (let ((resource (find-resource designator)))
+  (let ((resource
+	  (find-resource designator)))
     (when resource
-      (makunbound (resource-name resource))
       (remhash (resource-name resource) *resource-repository*))))
+
+(defun resource (name)
+  "The resource named NAME."
+  (check-type name symbol)
+  (or (find-resource name)
+      (error "There is no resource named ~A in the resource repository." name)))
+
+(defun (setf resource) (new-value name)
+  (check-type name symbol)
+  (cond ((eq new-value nil)
+	 (remove-resource name))
+	(t
+	 (setf (gethash name *resource-repository*) new-value))))
+
+(defun resources ()
+  (alexandria:hash-table-keys *resource-repository*)) 
+
+(defun (setf resources) (new-value)
+  (setf *resource-repository* (make-hash-table))
+  (loop :for resource :in new-value
+	:for name = (slot-value resource 'name)
+	:do (setf (resource name) resource)))
 
 
 ;;;
