@@ -39,11 +39,11 @@
 ;;;;
 
 (defun make-bootstrap-resource (&key (name 'bootstrap) (path "/bootstrap/"))
-  "Make a resource serving Bootstrap 5.3.0-alpha1 assets."
+  "Make a resource serving Bootstrap 5.3.0-alpha3 assets."
   (webmachine:make-directory-resource
    :name name
    :path path
-   :alias (asset-pathname #p"bootstrap-5.3.0-alpha1-dist/")))
+   :alias (asset-pathname #p"bootstrap-5.3.0-alpha3-dist/")))
 
 (defun make-bootstrap-icons-resource (&key (name 'bootstrap-icons) (path "/bootstrap/icons.svg"))
   "Make a resource serving Bootstrap icons."

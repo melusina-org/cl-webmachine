@@ -109,7 +109,7 @@
 	 "Build and customize with Sass, utilize prebuilt grid system"
 	 "and components, and bring projects to life with powerful"
 	 "JavaScript plugins.")
-     :version "5.3.0-alpha1"
+     :version "5.3.0-alpha3"
      :license "MIT"
      :actions
      '(("Homepage" . "https://getbootstrap.com")
