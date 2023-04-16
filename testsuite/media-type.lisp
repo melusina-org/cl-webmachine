@@ -28,6 +28,7 @@
 (define-testcase ensure-important-media-types-for-web-developers-are-known ()
   (ensure-media-types-are-known
    '(:application/octet-stream
+     :application/json
      :text/plain
      :text/css
      :text/html

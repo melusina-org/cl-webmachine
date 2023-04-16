@@ -13,13 +13,10 @@
 
 (in-package #:org.melusina.webmachine/testsuite)
 
-(defclass test-resource-hello (webmachine:resource) nil)
-
-(defmethod webmachine:resource-to-text/html ((resource test-resource-hello) request destination)
-  (format destination "<html>Hello, world!</html>"))
-
-;(defmethod webmachine:resource-to-text/plain ((resource test-resource-hello) request destination)
-;  (format destination "Hello!"))
+
+;;;;
+;;;; TESTSUITE-RESOURCE-HANDLE-REQUEST
+;;;;
 
 (defclass constant-resource (webmachine:resource)
   ((available-p
@@ -79,7 +76,7 @@
     "The return value of the `WEBMACHINE:RESOURCE-OPTIONS' generic function.")
    (content-types-provided
     :initarg :content-types-provided
-    :initform '((:text/html . webmachine:resource-to-text/html))
+    :initform '(:text/html)
     :documentation
     "The return value of the `WEBMACHINE:RESOURCE-CONTENT-TYPES-PROVIDED' generic function.")
    (languages-provided
@@ -96,15 +93,47 @@
     :initarg :encodings-provided
     :initform '(:identity)
     :documentation
-    "The return value of the `WEBMACHINE:RESOURCE-ENCODINGS-PROVIDED' generic function."))
+    "The return value of the `WEBMACHINE:RESOURCE-ENCODINGS-PROVIDED' generic function.")
+   (response
+    :initarg :response
+    :initform '((:text/html . "<html>A constant resource!</html>"))
+    :documentation
+    "An alist mapping CONTENT-TYPES to RESPONSE-BODY."))
   (:documentation
    "A resource on which generic functions return a fixed value, corresponding
 to initialisation parameters of the instance. Such a resource is useful
 for testing."))
 
+(defmethod initialize-instance :after ((instance constant-resource)
+                                       &rest initargs &key &allow-other-keys)
+  (declare (ignore initargs))
+  (with-slots (content-types-provided) instance
+    (setf content-types-provided
+          (mapcar #'webmachine:find-media-type content-types-provided))
+    (setf content-types-provided
+          (delete nil content-types-provided)))
+  (with-slots (response) instance
+    (when (typep response 'list)
+      (dolist (binding response)
+	(setf (car binding) (webmachine:find-media-type (car binding)))))))
 
-(defmethod webmachine:resource-to-text/html ((resource constant-resource) request destination)
-  (format destination "<html>A constant resource!</html>"))
+(defmethod webmachine:write-resource-response ((resource constant-resource)
+					       (request webmachine:get-request)
+					       (reply webmachine:reply)
+					       response-body)
+  (flet ((choose-response (response)
+           (etypecase response
+             (string
+              response)
+             (list
+              (cdr (assoc (webmachine:find-media-type
+			   (webmachine:reply-media-type reply))
+			  response)))))
+         (send-response (text)
+          (when text
+            (write-string text response-body))))
+    (send-response
+     (choose-response (slot-value resource 'response)))))
 
 (defmethod webmachine:resource-available-p and ((resource constant-resource))
   (slot-value resource 'available-p))
@@ -316,6 +345,8 @@ for testing."))
                       :path "/test/v3c3"
                       :name 'test/v3c3
                       :content-types-provided
+		      '(:text/plain :text/html :application/json)
+		      :response
                       '((:text/plain . "Hello, world!")
                         (:text/html . "<html>Hello, world!</html>")
                         (:application/json . "\"Hello, world!\""))))
@@ -347,6 +378,8 @@ for testing."))
                       :charsets-provided
                       '(:utf-8 :iso-8859-1)
                       :content-types-provided
+		      '(:text/plain :text/html :application/json)
+                      :response
                       '((:text/plain . "“Hello, world!”")
                         (:text/html . "<html>“Hello, world!”</html>")
                         (:application/json . "\"“Hello, world!”\""))))
@@ -380,23 +413,7 @@ for testing."))
       (assert-http-header-match :encoding "identity")
       (assert-http-body "<html>A constant resource!</html>"))))
 
-(define-testcase test-resource-hello ()
-  (with-testsuite-acceptor
-      ((make-instance 'test-resource-hello
-                      :name 'hello
-                      :path "/hello/:who"))
-    (with-http-reply ("/" :accept "text/plain")
-      (assert-http-status 404)
-      (assert-http-header-charset :utf-8)
-      (assert-http-header-match :server "Webmachine"))
-    (with-http-reply ("/hello/world" :accept "text/html")
-      (assert-http-status 200)
-      (assert-http-header-charset :utf-8)
-      (assert-http-header-match :server "Webmachine")
-      (assert-http-body "<html>Hello, world!</html>"))))
-
-(define-testcase testsuite-resource ()
-  (test-resource-hello)
+(define-testcase testsuite-resource-handle-request ()
   (test-v3b13)
   (unless "The extension of allowed method list is not supported by Hunchentoot."
     (test-v3b12))
@@ -413,5 +430,60 @@ for testing."))
   (test-v3d5)
   (test-v3e6)
   (test-v3f7))
+
+
+;;;;
+;;;; TEST-RESOURCE-HELLO
+;;;;
+
+(define-testcase test-resource-hello ()
+  (with-testsuite-acceptor
+      ((make-instance 'test-resource-hello
+                      :name 'hello
+                      :path "/hello/:who"))
+    (with-http-reply ("/" :accept "text/plain")
+      (assert-http-status 404)
+      (assert-http-header-charset :utf-8)
+      (assert-http-header-match :server "Webmachine"))
+    (with-http-reply ("/hello/world" :accept "text/html")
+      (assert-http-status 200)
+      (assert-http-header-charset :utf-8)
+      (assert-http-header-match :server "Webmachine")
+      (assert-http-body "<html>Hello, world!</html>"))
+    (with-http-reply ("/hello/world" :accept "text/plain")
+      (assert-http-status 200)
+      (assert-http-header-charset :utf-8)
+      (assert-http-header-match :server "Webmachine")
+      (assert-http-body "Hello!"))))
+
+(defclass test-resource-hello (webmachine:resource) nil)
+
+(defmethod webmachine:resource-content-types-provided ((instance test-resource-hello))
+  (declare (ignore instance))
+  '(:text/html :text/plain))
+
+(defmethod webmachine:resource-charsets-provided ((instance test-resource-hello))
+  '(:utf-8))
+
+(defmethod webmachine:write-resource-response ((resource test-resource-hello)
+					       (request webmachine:get-request)
+					       (reply webmachine:text/html-reply)
+					       response-body)
+  (format response-body "<html>Hello, world!</html>"))
+
+(defmethod webmachine:write-resource-response ((resource test-resource-hello)
+					       (request webmachine:get-request)
+					       (reply webmachine:text/plain-reply)
+					       response-body)
+  (format response-body "Hello!"))
+
+
+;;;;
+;;;; TESTSUITE-RESOURCE
+;;;;
+
+(define-testcase testsuite-resource ()
+  (testsuite-resource-handle-request)
+  (test-resource-hello))
 
 ;;;; End of file `resource.lisp'

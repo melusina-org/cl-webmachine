@@ -14,9 +14,9 @@
 (in-package #:org.melusina.webmachine)
 
 
-;;;
-;;; Header Analysis
-;;;
+;;;;
+;;;; Header Analysis
+;;;;
 
 (defparameter *header-accept-regex*
   (let* ((media-type-word
@@ -73,14 +73,13 @@ quality. (This is a stable sort.)"
 (defun negotiate-accept (accept offer)
   "Negotiate the :ACCEPT content type.
 The ACCEPT parameter is an alist of (MEDIA-TYPE . QUALITY) sorted by decreasing
-quality.  The OFFER parameter is an alist of (MEDIA-TYPE . HANDLER). The result
-of the negotiation is the cell (MEDIA-TYPE . HANDLER) that best matches the
-ACCEPT parameter, or NIL."
+quality.  The OFFER parameter is a list of acceptable MEDIA-TYPE values. The result
+of the negotiation is the MEDIA-TYPE that best matches the ACCEPT parameter, or NIL."
   (flet ((match-media-type-p (accept offer)
 	   "Predicate recognising when the media type OFFER matches the string ACCEPT."
 	   (string-match accept (slot-value (find-media-type offer) 'name))))
     (loop :for (accepted-media-type . _ ) :in accept
-          :thereis (assoc accepted-media-type offer :test #'match-media-type-p))))
+          :thereis (find accepted-media-type offer :test #'match-media-type-p))))
 
 (defun negotiate-accept-language (accept offer)
   "Negotiate the :ACCEPT-LANGUAGE language.
@@ -424,25 +423,23 @@ that request with a 406 Not Acceptable. (V3D5)")
 (defgeneric resource-content-types-provided (resource)
   (:documentation
    "Content negociation for accepted content types.
-This should return a list of pairs where each pair is of the form
-(MEDIA-TYPE . HANDLER) where MEDIA-TYPE is a string of content-type
-format and the HANDLER is an atom naming the function which can
-provide a resource representation in that media type. Content
-negotiation is driven by this return value. For example, if a client
-request includes an :ACCEPT header with a value that does not appear
-as a first element in any of the return tuples, then a
-406 Not Acceptable will be sent.
 
-Default: (:text/html . 'resource-to-html)")
-  (:method (resource) '((:text/html . resource-to-text/html))))
+This should return a list of accepted media types designators.  Content
+negotiation is driven by this return value.
 
-(defgeneric resource-to-text/html (resource request destination)
-  (:documentation
-   "Provide a text/html representation of a resource.")
-  (:method (resource request destination)
-    (http-error
-     501
-     "Cannot provide a text/html representation of this resource")))
+For example, if a client request includes an :ACCEPT header with a value
+that does not appear in the list of content types provided, then a 406
+Not Acceptable will be sent.")
+  (:method (resource) nil))
+
+
+(defgeneric write-resource-response (resource request reply response-body)
+  (:documentation "Write the RESOURCE response for REQUEST to RESPONSE-BODY.
+The response must be represented as sepcificed by the content type of
+the REPLY.")
+  (:method (resource request reply response-body)
+    (declare (ignore resource request response-body))
+    (http-error 500)))
 
 (defgeneric resource-charsets-provided (resource)
   (:documentation
@@ -471,6 +468,7 @@ Default: (:identity)")
 
 ;;;;
 ;;;; Handle Request
+;;;;  following Webmachine Logic
 ;;;;
 
 (defun resource-handle-request (resource request reply)
@@ -492,11 +490,7 @@ This walks down the decision graph of the Webmachine."
                    (hunchentoot::maybe-add-charset-to-content-type-header
                     (hunchentoot:header-out :content-type reply)
                     external-format))
-             (typecase (slot-value reply 'content-handler)
-               (string
-		(write-string (slot-value reply 'content-handler) response-body))
-               (t
-		(funcall (slot-value reply 'content-handler) resource request response-body))))))
+	     (write-resource-response resource request reply response-body))))
        (specialize-request ()
 	 "Specialize REQUEST according to its request method."
 	 (check-type request hunchentoot:request)
@@ -532,13 +526,10 @@ This walks down the decision graph of the Webmachine."
 		      (parse-header-accept-* (hunchentoot:header-in :accept request))
 		      (resource-content-types-provided resource)))))
 	   (when chosen
-	     (destructuring-bind (media-type . content-handler) chosen
-	       (setf media-type
-		     (find-media-type media-type))
-               (setf (hunchentoot:header-out :content-type reply)
-		     (media-type-name media-type))
-	       (setf (slot-value reply 'content-handler)
-		     content-handler)))
+	     (setf chosen
+		   (find-media-type chosen))
+	     (setf (hunchentoot:header-out :content-type reply)
+		   (media-type-name chosen)))
 	   chosen))
        (choose-language ()
 	 (let ((language

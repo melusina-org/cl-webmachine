@@ -14,14 +14,10 @@
 (in-package #:org.melusina.webmachine)
 
 (defclass reply (hunchentoot:reply)
-  ((content-handler
-    :initarg :content-type
-    :initform 'resource-to-text/html
-    :documentation
-    "The content handler function used to present the request result.
-The CONTENT-HANDLER is an atom that can be `FUNCALL'-ed.
-
-See also `RESOURCE-CONTENT-TYPES-PROVIDED'."))
+  ((media-type
+    :initform :application
+    :reader reply-media-type
+    :allocation :class))
   (:documentation "Objects of this class hold all the information
 about an outgoing reply.  They are created automatically by
 Webmachine and can be accessed and modified by the corresponding
@@ -32,50 +28,100 @@ handler."))
 ;;;; Replies assocaited to discrete media types
 ;;;;
 
-(defclass application-reply (reply) nil
+(defclass application-reply (reply)
+  ((media-type
+    :initform :application
+    :allocation :class))
   (:documentation "The REPLY subclass for content of general type."))
 
-(defclass audio-reply (reply) nil
+(defclass audio-reply (reply)
+  ((media-type
+    :initform :audio
+    :allocation :class))
   (:documentation "The REPLY subclass for audio content."))
 
-(defclass font-reply (reply) nil
+(defclass font-reply (reply)
+  ((media-type
+    :initform :font
+    :allocation :class))
   (:documentation "The REPLY subclass for font or typeface content."))
 
-(defclass image-reply (reply) nil
+(defclass image-reply (reply)
+  ((media-type
+    :initform :image
+    :allocation :class))
   (:documentation "The REPLY subclass for image content."))
 
-(defclass model-reply (reply) nil
+(defclass model-reply (reply)
+  ((media-type
+    :initform :model
+    :allocation :class))
   (:documentation "The REPLY subclass for 3D model content."))
 
-(defclass text-reply (reply) nil
+(defclass text-reply (reply)
+  ((media-type
+    :initform :text
+    :allocation :class))
   (:documentation "The REPLY subclass for text content."))
 
-(defclass video-reply (reply) nil
+(defclass video-reply (reply)
+  ((media-type
+    :initform :video
+    :allocation :class))
   (:documentation "The REPLY subclass for video content."))
 
-(defclass application/octet-stream-reply (application-reply) nil
+(defclass application/octet-stream-reply (application-reply)
+  ((media-type
+    :initform :application/octet-stream
+    :allocation :class))
   (:documentation "The REPLY subclass for application/octet-stream content."))
 
-(defclass text/css-reply (text-reply) nil
+(defclass application/json-reply (application-reply)
+  ((media-type
+    :initform :application/json
+    :allocation :class))
+  (:documentation "The REPLY subclass for application/json content."))
+
+(defclass text/css-reply (text-reply)
+  ((media-type
+    :initform :text/css
+    :allocation :class))
   (:documentation "The REPLY subclass for text/css content."))
 
-(defclass text/html-reply (text-reply) nil
+(defclass text/html-reply (text-reply)
+  ((media-type
+    :initform :text/html
+    :allocation :class))
   (:documentation "The REPLY subclass for text/html content."))
 
-(defclass text/javascript-reply (text-reply) nil
+(defclass text/javascript-reply (text-reply)
+  ((media-type
+    :initform :text/javascript
+    :allocation :class))
   (:documentation "The REPLY subclass for text/javascript content."))
 
-(defclass text/plain-reply (text-reply) nil
+(defclass text/plain-reply (text-reply)
+  ((media-type
+    :initform :text/plain
+    :allocation :class))
   (:documentation "The REPLY subclass for text/plain content."))
 
-(defclass image/jpeg-reply (image-reply) nil
+(defclass image/jpeg-reply (image-reply)
+  ((media-type
+    :initform :image/jpeg
+    :allocation :class))
   (:documentation "The REPLY subclass for image/jpeg content."))
 
-(defclass image/png-reply (image-reply) nil
+(defclass image/png-reply (image-reply)
+  ((media-type
+    :initform :image/png
+    :allocation :class))
   (:documentation "The REPLY subclass for image/png content."))
 
-(defclass image/svg+xml-reply (image-reply) nil
+(defclass image/svg+xml-reply (image-reply)
+  ((media-type
+    :initform :image/svg+xml
+    :allocation :class))
   (:documentation "The REPLY subclass for image/svg+xml content."))
 
 ;;;; End of file `reply.lisp'
-

@@ -54,6 +54,7 @@
    #:text-reply
    #:video-reply
    #:application/octet-stream-reply
+   #:application/json-reply
    #:text/css-reply
    #:text/html-reply
    #:text/javascript-reply
@@ -85,6 +86,7 @@
    #:list-media-types
    #:describe-media-types
    #:match-media-type-p
+   #:reply-media-type
    ;; Repository of Web Resources
    #:resource
    #:resource-p
@@ -107,7 +109,7 @@
    #:resource-languages-provided
    #:resource-encodings-provided
    #:resource-charsets-provided
-   #:resource-to-text/html
+   #:write-resource-response
    ;; Acceptor
    #:acceptor
    #:ssl-acceptor

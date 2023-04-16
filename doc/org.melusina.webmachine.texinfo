@@ -128,6 +128,7 @@ Many accessors and slots can be used from the HUNCHENTOOT package.
 @include include/class-org.melusina.webmachine-reply.texinfo
 @include include/class-org.melusina.webmachine-application-reply.texinfo
 @include include/class-org.melusina.webmachine-application-slash-octet-stream-reply.texinfo
+@include include/class-org.melusina.webmachine-application-slash-json.texinfo
 @include include/class-org.melusina.webmachine-audio-reply.texinfo
 @include include/class-org.melusina.webmachine-font-reply.texinfo
 @include include/class-org.melusina.webmachine-image-reply.texinfo

@@ -52,6 +52,8 @@ its IDENTIFIER as the key.")
   "Predicate recognising media types."
   (typep thing 'media-type))
 
+(declaim (ftype (function (t) (or null media-type)) find-media-type))
+
 (defun find-media-type (designator)
   "Find a media-type whose name matches DESIGNATOR.
 When a media type corresponding to DESIGNATOR is found, this request
@@ -69,7 +71,7 @@ a keyword, a request-method, or a symbol."
     ((media-type-p designator)
      designator)
     ((and designator (symbolp designator))
-     (gethash designator *media-type-repository*))
+     (nth-value 0 (gethash designator *media-type-repository*)))
     (t
      (error "~A is not a valid media-type designator." designator))))
 
@@ -175,6 +177,10 @@ As it means unknown binary file, browsers usually don't execute it,
 or even ask if it should be executed. They treat it as if the
 Content-Disposition header was set to attachment, and propose a “Save
 As” dialog.")
+
+(define-media-type :application/json
+  :reply-class 'application/json-reply
+  :description "A document written in JSON.")
 
 (define-media-type :text/css
   :reply-class 'text/css-reply
