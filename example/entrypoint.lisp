@@ -28,8 +28,8 @@
     (resource 'features)
     (resource 'system-health)
     (resource 'example.css)
-    (make-user-administration-resource)
-    (make-user-resource))
+    (make-user-index-resource)
+    (make-user-detail-resource))
    :swank t))
 
 (defun stop ()
