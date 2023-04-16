@@ -12,14 +12,17 @@
 ;;;; are also available at https://opensource.org/licenses/MIT
 
 (defpackage #:org.melusina.webmachine/example
-  (:use #:common-lisp)
+  (:use #:common-lisp #:parenscript)
   (:local-nicknames
    (#:who #:cl-who)
    (#:css #:cl-css)
    (#:webmachine #:org.melusina.webmachine)
    (#:server #:org.melusina.webmachine/server))
   (:export
-   
+   #:functional-state-javascript
+   #:start
+   #:stop
+   #:create-users
    #:toplevel))
 
 (in-package #:org.melusina.webmachine/example)

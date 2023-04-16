@@ -19,6 +19,17 @@
 	     (:name "User" :email "joe@melusina.invalid" :password "*" :administrator nil)))
     (apply #'add-user user-spec)))
 
+
+(defun start ()
+  (server:start
+   (list
+    (make-instance 'user-administration)
+    (make-instance 'user-resource))
+   :swank t))
+
+(defun stop ()
+  (server:stop))
+
 (defun toplevel (&optional argv)
   "The toplevel form for the Webmachine example program."
   (labels
@@ -30,7 +41,7 @@
        (run-server ()
 	 (restart-case
 	     (progn
-	       (server:start nil :swank t)
+	       (start)
 	       (idle-loop))
 	   (abort ()
 	     :report

@@ -106,7 +106,7 @@
     (handler-case
         (loop :for resource :in (slot-value instance 'resources)
               :when (resource-handle-request-p resource request)
-              :do (return (resource-handle-request resource request hunchentoot::*reply*))
+              :return (resource-handle-request resource request hunchentoot::*reply*)
               :finally (http-error 404))
       (http-condition (c)
         (setf (hunchentoot:return-code*) (http-condition-status-code c))

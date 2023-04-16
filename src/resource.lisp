@@ -577,7 +577,6 @@ This walks down the decision graph of the Webmachine."
   (declare (optimize (debug 3) (safety 3)))
   (labels
       ((response ()
-	 (specialize-request)
 	 (specialize-reply)
          (let ((external-format
 		 (when (slot-value request 'charset)
@@ -590,7 +589,11 @@ This walks down the decision graph of the Webmachine."
                    (hunchentoot::maybe-add-charset-to-content-type-header
                     (hunchentoot:header-out :content-type reply)
                     external-format))
-	     (write-resource-response resource request reply response-body))))
+	     (let ((string-response-body
+		     (write-resource-response resource request reply response-body)))
+	       (if (stringp string-response-body)
+		   (write-string string-response-body response-body))
+	       (finish-output response-body)))))
        (specialize-request ()
 	 "Specialize REQUEST according to its request method."
 	 (check-type request hunchentoot:request)
@@ -684,7 +687,9 @@ This walks down the decision graph of the Webmachine."
              (halt 503)))
        (v3b12 ()
          (if (position (hunchentoot:request-method request) (resource-known-methods resource))
-	     (v3b11)
+	     (progn
+	       	 (specialize-request)
+		 (v3b11))
              (halt 501)))
        (v3b11 ()
          (if (resource-uri-too-long-p resource request)

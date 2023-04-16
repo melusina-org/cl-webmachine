@@ -57,12 +57,14 @@
   :author "Michaël Le Barbier"
   :license "MIT License"
   :depends-on (#:unix-opts
+	       #:shasht
 	       #:org.melusina.webmachine/server)
   :components
   ((:module "example"
     :components ((:file "package")
 		 (:file "utilities")
 		 (:file "html")
+		 (:file "javascript")
 		 (:module "domain"
 		  :components ((:file "user")))
 		 (:module "view"

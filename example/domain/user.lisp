@@ -37,6 +37,16 @@
 	       0)))
     (push (apply #'make-instance 'user :id (next-id) initargs) *users*)))
 
+(defun delete-user (designator)
+  "Delete the user designated by DESIGNATOR."
+  (multiple-value-bind (test key)
+      (etypecase designator
+	(string
+	 (values #'string-equal #'email))
+	(integer
+	 (values #'= #'id)))
+    (setf *users* (delete designator *users* :test test :key key))))
+
 (defun find-user (designator)
   "Find a user by ID or EMAIL."
   (typecase designator

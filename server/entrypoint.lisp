@@ -95,7 +95,7 @@ We use an acceptor deriving from Hunchentoot to easily serve static content."))
   (when swank
     (start-swank)))
 
-(defun stop-server (&key (service t) (swank t))
+(defun stop (&key (service t) (swank t))
   "Stop the server."
   (when service
     (stop-service))

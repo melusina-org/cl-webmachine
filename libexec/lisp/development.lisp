@@ -1,4 +1,4 @@
-;;;; setup.lisp — Project setup for Webmachine
+;;;; development.lisp — Project Development for Webmachine
 
 ;;;; Webmachine (https://github.com/melusina-org/cl-webmachine)
 ;;;; This file is part of Webmachine.
@@ -17,7 +17,8 @@
    (#:atelier #:org.melusina.atelier)
    (#:example #:org.melusina.webmachine/example))
   (:export
-   #:lint))
+   #:lint
+   #:reload))
 
 (in-package #:org.melusina.webmachine/development)
 
@@ -47,6 +48,25 @@
      #p"server"
      #p"example"
      #p"development"
-     #p"libexec/lisp/setup.lisp")))
+     #p"libexec/lisp/setup.lisp"
+     #p"libexec/lisp/development.lisp")))
 
-;;;; End of file `setup.lisp'
+(defun reload ()
+  (ql:quickload '("org.melusina.atelier"
+		  "org.melusina.confidence"
+		  "org.melusina.webmachine"
+		  "org.melusina.webmachine/development"
+		  "org.melusina.webmachine/testsuite"
+		  "org.melusina.webmachine/server"
+		  "org.melusina.webmachine/example"))
+  (setf hunchentoot:*catch-errors-p* t))
+
+
+;;;;
+;;;; Command Stock
+;;;;
+
+#+nil
+(org.melusina.webmachine/development:reload)
+
+;;;; End of file `development.lisp'

@@ -13,6 +13,11 @@
 
 (in-package #:org.melusina.webmachine/example)
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (setf
+   (who:html-mode) :html5
+   who:*attribute-quote-char* #\"))
+
 (defun bootstrap-icon (&key (class "bi") width height label (icon "bootstrap"))
   (who:with-html-output (*standard-output*)
     (:svg 
@@ -20,6 +25,25 @@
      :aria-label label
      (format *standard-output*
 	     "<use xlink:href=\"/bootstrap/icons.svg#~A\"></use>" icon))))
+
+(defun bootstrap-margin (classes margin)
+  "Ass MARGIN to CLASSES."
+  (let ((margin-class
+	  (when margin
+	    (ecase margin
+	      (:start
+	       "ms-1")
+	      (:end
+	       "me-1")
+	      ((:x :both)
+	       "mx-1")))))
+    (if margin-class
+	(concatenate 'string classes " " margin-class)
+	classes)))
+
+(defun html-classes (&rest classes)
+  "Concatenate classes."
+  (format nil "~{~A~^ ~}" classes))
 
 (defun html-login-sign-up-combo ()
   (who:with-html-output (*standard-output*)
@@ -122,6 +146,7 @@
       :height "3rem"
       :font-size "1.5rem"
       :border-radius ".75rem"))))
+   
 
 (defmacro html-page ((&key title (lang "en") (mathjax nil) (chartjs nil) navigation)
 		     &body body)
@@ -137,8 +162,8 @@
        (:link
 	:href "/example.css"
 	:rel "stylesheet")
-       (write-mathjax-configuration ,mathjax)
-       (write-chartjs-configuration ,chartjs))
+       (server::write-mathjax-configuration ,mathjax)
+       (server::write-chartjs-configuration ,chartjs))
       (:body
        (html-navigation-bar ,navigation)
        (:div :class "container"

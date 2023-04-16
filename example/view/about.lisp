@@ -79,7 +79,7 @@
      :label "GitHub"
      :icon "github"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "The GitHub repository where the source of"
 	 "the Webmachine Project is stored.")
      :actions
@@ -104,7 +104,7 @@
      :label "Bootstrap"
      :icon "bootstrap"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Powerful, extensible, and feature-packed frontend toolkit."
 	 "Build and customize with Sass, utilize prebuilt grid system"
 	 "and components, and bring projects to life with powerful"
@@ -122,7 +122,7 @@
      :version "3.2.2"
      :license "Apache 2.0"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Beautiful and accessible math in all browsers."
 	 "A JavaScript display engine for mathematics"
 	 "that works in all browsers. No more setup for readers."
@@ -140,7 +140,7 @@
      :version "4.2.0"
      :license "MIT"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Chart.js provides a set of frequently used chart types, plugins,"
 	 "and customization options. In addition to a reasonable set of"
 	 "built-in chart types, you can use additional community-maintained"
@@ -160,7 +160,7 @@
      :version hunchentoot:*hunchentoot-version*
      :license "BSD-2"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Hunchentoot is a web server written in Common Lisp and"
 	 "at the same time a toolkit for building dynamic websites.")
      :actions
@@ -169,7 +169,25 @@
        ("Repository" .
 	"https://github.com/edicl/hunchentoot")
        ("Release" .
-	"https://github.com/edicl/hunchentoot/releases/tag/v1.3.0")))))
+	"https://github.com/edicl/hunchentoot/releases/tag/v1.3.0")))
+    (about-software
+     :label "Parenscript"
+     :icon "box-seam"
+     :version parenscript:*version*
+     :license "BSD-3"
+     :paragraph
+     #.(concatenate
+	'string
+	"Parenscript is a translator from an extended subset of Common Lisp to JavaScript. Parenscript code "
+	"can run almost identically on both the browser (as JavaScript) and server (as Common Lisp).")
+     :actions
+     '(("Homepage" .
+	"https://parenscript.common-lisp.dev")
+       ("Repository" .
+	"https://gitlab.common-lisp.net/parenscript/parenscript.git")
+       ("Documentation" .
+	"https://parenscript.common-lisp.dev/reference.html")))
+    ))
 
 
 ;;;;
@@ -183,7 +201,7 @@
      :label "Machine"
      :icon "cpu-fill"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Characteristics of the current machine as reflected by"
 	 "Common Lisp functions <em>machine-type,</em>"
 	 "<em>machine-version</em> and <em>machine-instance.</em>")
@@ -192,7 +210,7 @@
      :label "Lisp Implementation"
      :icon "arrow-repeat"
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Characteristics of the current Lisp implementation as reflected by"
 	 "Common Lisp functions <em>lisp-implementation-type,</em>"
 	 "and <em>lisp-implementation-version.</em>")
@@ -203,7 +221,7 @@
      :icon "quora"
      :badges (list (ql:dist-version "quicklisp"))
      :paragraph
-     #.(join
+     #.(concatenate 'string
 	 "Quicklisp is a library manager for Common Lisp. It works with your"
 	 "existing Common Lisp implementation to download, install, and load"
 	 "any of over 1,500 libraries with a few simple commands.")

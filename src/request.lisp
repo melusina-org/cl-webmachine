@@ -48,6 +48,11 @@ The possible values for this field are:
 about an incoming request. They are created automatically by
 acceptors and can be accessed by the corresponding handler."))
 
+
+;;;;
+;;;; Request by Method
+;;;;
+
 (defclass get-request (request) nil
   (:documentation "The GET method requests a representation of the specified resource.
 Requests using GET should only retrieve data.
@@ -91,14 +96,13 @@ WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/TRACE"))
   (:documentation "The PATCH method is used to apply partial modifications to a resource.
 WWW: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH"))
 
-
 
 ;;;;
 ;;;; WITH-PATH-PARAMETERS
 ;;;;
 
 (defun parameter-value (name request)
-  "The value associate to NAME in request.
+  "The value associated to NAME in request.
 When NAME has no associated value, a status code 400 Bad Request is
 returned."
   (or (cdr (assoc name (slot-value request 'path-parameters)
