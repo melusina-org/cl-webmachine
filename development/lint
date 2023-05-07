@@ -14,6 +14,7 @@
 # are also available at https://opensource.org/licenses/MIT
 
 : ${TOPLEVELDIR:=$(git rev-parse --show-toplevel)}
+: ${lintsystem:="org.melusina.webmachine/development"}
 
 lint_sbcl()
 {
@@ -22,13 +23,9 @@ lint_sbcl()
 
 lint_main()
 {
-    lint_sbcl --load "${TOPLEVELDIR}/libexec/lisp/setup.lisp"\
-	      --eval '(org.melusina.atelier:lint
- #p"src"
- #p"testsuite"
- #p"development"
- #p"libexec/lisp/setup.lisp"
-)'
+    lint_sbcl --eval "(ql:quickload \"${lintsystem}\" :silent t)"\
+	      --eval "(${lintsystem}:lint)"\
+	      --quit
 }
 
 lint_main "$@"

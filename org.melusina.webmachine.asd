@@ -91,7 +91,7 @@
 		 (:file "entrypoint")))))
 
 (asdf:defsystem #:org.melusina.webmachine/signature
-  :description "A Webmachine example"
+  :description "A Webmachine example for cryptographic signatures"
   :author "Michaël Le Barbier"
   :license "MIT License"
   :depends-on (#:ironclad

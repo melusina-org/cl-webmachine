@@ -27,7 +27,7 @@
 
 (defun system-relative-pathname (pathname)
   (flet ((system-source-directory ()
-	   (asdf:system-source-directory (string-downcase (package-name *package*)))))
+	   (asdf:system-source-directory #.(string-downcase (package-name *package*)))))
     (merge-pathnames pathname (system-source-directory))))
 
 (defun system-relative-pathnames (&rest pathnames)
