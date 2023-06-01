@@ -21,6 +21,7 @@
    (#:example #:org.melusina.webmachine/example))
   (:export
    #:lint
+   #+quicklisp
    #:reload))
 
 (in-package #:org.melusina.webmachine/development)
@@ -62,6 +63,7 @@
       #p"libexec/lisp/setup.lisp"
       #p"libexec/lisp/development.lisp"))))
 
+#+quicklisp
 (defun reload ()
   (ql:quickload '("org.melusina.atelier"
 		  "org.melusina.confidence"
