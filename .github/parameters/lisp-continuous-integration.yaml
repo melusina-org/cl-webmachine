@@ -1,0 +1,31 @@
+main-system: 'org.melusina.webmachine'
+unit-tests:
+  system: 'org.melusina.webmachine/testsuite'
+  entrypoint: 'run-all-tests'
+#component-tests:
+#deployment-tests:
+linter:
+  system: 'org.melusina.webmachine/development'
+  entrypoint: 'lint'
+
+fast:
+  os:
+    - ubuntu-latest
+  implementation:
+    - sbcl
+tier-1:
+  os:
+    - ubuntu-latest
+    - macos-latest
+  implementation:
+    - sbcl
+tier-2:
+  os:
+    - ubuntu-latest
+    - macos-latest
+  implementation:
+    - abcl
+    - ccl
+    - clisp
+    - ecl
+    - gcl
