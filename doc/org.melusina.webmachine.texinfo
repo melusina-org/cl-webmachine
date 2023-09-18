@@ -128,7 +128,6 @@ Many accessors and slots can be used from the HUNCHENTOOT package.
 @include include/class-org.melusina.webmachine-reply.texinfo
 @include include/class-org.melusina.webmachine-application-reply.texinfo
 @include include/class-org.melusina.webmachine-application-slash-octet-stream-reply.texinfo
-@include include/class-org.melusina.webmachine-application-slash-json.texinfo
 @include include/class-org.melusina.webmachine-audio-reply.texinfo
 @include include/class-org.melusina.webmachine-font-reply.texinfo
 @include include/class-org.melusina.webmachine-image-reply.texinfo
@@ -161,7 +160,6 @@ Many accessors and slots can be used from the HUNCHENTOOT package.
 @chapter Repository of Media Types
 
 @include include/class-org.melusina.webmachine-media-type.texinfo
-@include include/fun-org.melusina.webmachine-media-type-p.texinfo
 @include include/fun-org.melusina.webmachine-make-media-type.texinfo
 @include include/macro-org.melusina.webmachine-define-media-type.texinfo
 @include include/fun-org.melusina.webmachine-find-media-type.texinfo
@@ -197,7 +195,6 @@ Many accessors and slots can be used from the HUNCHENTOOT package.
 @include include/fun-org.melusina.webmachine-resource-options.texinfo
 @include include/fun-org.melusina.webmachine-resource-languages-provided.texinfo
 @include include/fun-org.melusina.webmachine-resource-content-types-provided.texinfo
-@include include/fun-org.melusina.webmachine-resource-to-text-slash-html.texinfo
 @include include/fun-org.melusina.webmachine-resource-charsets-provided.texinfo
 @include include/fun-org.melusina.webmachine-resource-encodings-provided.texinfo
 
