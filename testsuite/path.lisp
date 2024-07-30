@@ -11,7 +11,7 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(in-package #:org.melusina.webmachine/testsuite)
+(in-package #:webmachine/testsuite)
 
 (define-testcase test-match-path (path uri expected-match-p expected-parameters)
   (multiple-value-bind (actual-match-p actual-parameters)

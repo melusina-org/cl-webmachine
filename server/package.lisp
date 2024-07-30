@@ -11,12 +11,11 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(defpackage #:org.melusina.webmachine/server
+(defpackage #:webmachine/server
   (:use #:common-lisp)
   (:local-nicknames
    (#:who #:cl-who)
-   (#:css #:cl-css)
-   (#:webmachine #:org.melusina.webmachine))
+   (#:css #:cl-css))
   (:export
    
    ;; Server
@@ -31,6 +30,6 @@
    ;; HTML
    #:html-page))
 
-(in-package #:org.melusina.webmachine/server)
+(in-package #:webmachine/server)
 
 ;;;; End of file `package.lisp'

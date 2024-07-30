@@ -11,7 +11,7 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(defpackage #:org.melusina.webmachine
+(defpackage #:webmachine
   (:use #:cl)
   (:import-from #:trivia #:match)
   (:import-from
@@ -134,6 +134,6 @@
    #:resources
   ))
 
-(in-package #:org.melusina.webmachine)
+(in-package #:webmachine)
 
 ;;;; End of file `package.lisp'

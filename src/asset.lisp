@@ -11,22 +11,20 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(defpackage #:org.melusina.webmachine/asset
+(defpackage #:webmachine/asset
   (:use #:cl)
-  (:local-nicknames
-   (#:webmachine #:org.melusina.webmachine))
   (:export
    #:make-bootstrap-resource
    #:make-bootstrap-icons-resource
    #:make-mathjax-resource
    #:make-chartjs-resource))
 
-(in-package #:org.melusina.webmachine/asset)
+(in-package #:webmachine/asset)
 
 (defparameter *assetdir*
   #.(merge-pathnames
      #p"asset/"
-     (asdf:system-source-directory (string-downcase (package-name *package*))))
+     (asdf:system-source-directory '#:org.melusina.webmachine))
   "The pathname to the directory holding program assets.")
 
 (defun asset-pathname (pathname)

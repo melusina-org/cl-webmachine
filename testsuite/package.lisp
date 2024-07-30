@@ -11,18 +11,16 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(defpackage #:org.melusina.webmachine/testsuite
+(defpackage #:webmachine/testsuite
   (:use #:common-lisp)
   (:local-nicknames
-   (#:webmachine #:org.melusina.webmachine)
-   (#:example #:org.melusina.webmachine/example)
-   (#:signature #:org.melusina.webmachine/signature)
-   (#:confidence #:org.melusina.confidence))
+   (#:example #:webmachine/example)
+   (#:signature #:webmachine/signature))
   (:import-from
    #:alexandria
    #:ensure-list
    #:with-unique-names)
-  (:import-from #:org.melusina.confidence
+  (:import-from #:confidence
    #:define-testcase
    #:define-assertion
    #:assert-condition
@@ -36,6 +34,6 @@
    #:assert-string=
    #:assert-type))
 
-(in-package #:org.melusina.webmachine/testsuite)
+(in-package #:webmachine/testsuite)
 
 ;;;; End of file `package.lisp'

@@ -15,6 +15,7 @@
 
 : ${TOPLEVELDIR:=$(git rev-parse --show-toplevel)}
 : ${testsuitesystem:="org.melusina.webmachine/testsuite"}
+: ${testsuitepackage:=${testsuitesystem#'org.melusina.'}}
 : ${testsuiteclean:='no'}
 : ${testsuitelisp:='sbcl'}
 
@@ -37,7 +38,7 @@ testsuite_run()
     fi
     testsuite_lisp\
 	--eval "(ql:quickload \"${testsuitesystem}\" :silent t)"\
-	--eval "(${testsuitesystem}:$1)"\
+	--eval "(${testsuitepackage}:$1)"\
 	--eval '(org.melusina.confidence:quit)'
 }
 

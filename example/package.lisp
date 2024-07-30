@@ -11,16 +11,15 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(defpackage #:org.melusina.webmachine/example
+(defpackage #:webmachine/example
   (:use #:common-lisp #:parenscript)
   (:local-nicknames
    (#:who #:cl-who)
    (#:css #:cl-css)
-   (#:webmachine #:org.melusina.webmachine)
-   (#:asset #:org.melusina.webmachine/asset)
-   (#:server #:org.melusina.webmachine/server))
+   (#:asset #:webmachine/asset)
+   (#:server #:webmachine/server))
   (:import-from
-   #:org.melusina.webmachine
+   #:webmachine
    #:define-constant-resource)
   (:export
    #:functional-state-javascript
@@ -29,6 +28,6 @@
    #:create-users
    #:toplevel))
 
-(in-package #:org.melusina.webmachine/example)
+(in-package #:webmachine/example)
 
 ;;;; End of file `package.lisp'

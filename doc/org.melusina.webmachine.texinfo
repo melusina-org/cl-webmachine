@@ -88,120 +88,120 @@ it with that name.
 
 @node Configuration, Condition, Top, Top
 @chapter Configuration
-@include include/var-org.melusina.webmachine-star-catch-errors-star.texinfo
+@include include/var-webmachine-star-catch-errors-star.texinfo
 
 @node Condition, Content, Configuration, Top
 @chapter Protocol Condition
 
-@include include/condition-org.melusina.webmachine-http-condition.texinfo
-@include include/condition-org.melusina.webmachine-http-error.texinfo
-@include include/fun-org.melusina.webmachine-http-condition-short-description.texinfo
-@include include/fun-org.melusina.webmachine-http-error.texinfo
+@include include/condition-webmachine-http-condition.texinfo
+@include include/condition-webmachine-http-error.texinfo
+@include include/fun-webmachine-http-condition-short-description.texinfo
+@include include/fun-webmachine-http-error.texinfo
 
 @node Content, Request, Condition, Top
 @chapter Output Content
 
-@include include/macro-org.melusina.webmachine-with-content-output-to-sequence.texinfo
-@include include/fun-org.melusina.webmachine-make-content-output-stream.texinfo
+@include include/macro-webmachine-with-content-output-to-sequence.texinfo
+@include include/fun-webmachine-make-content-output-stream.texinfo
 
 @node Request, Reply, Content, Top
 @chapter Request
 
 Many accessors and slots can be used from the HUNCHENTOOT package.
 
-@include include/class-org.melusina.webmachine-request.texinfo
-@include include/class-org.melusina.webmachine-get-request.texinfo
-@include include/class-org.melusina.webmachine-head-request.texinfo
-@include include/class-org.melusina.webmachine-post-request.texinfo
-@include include/class-org.melusina.webmachine-put-request.texinfo
-@include include/class-org.melusina.webmachine-delete-request.texinfo
-@include include/class-org.melusina.webmachine-connect-request.texinfo
-@include include/class-org.melusina.webmachine-options-request.texinfo
-@include include/class-org.melusina.webmachine-trace-request.texinfo
-@include include/class-org.melusina.webmachine-patch-request.texinfo
+@include include/class-webmachine-request.texinfo
+@include include/class-webmachine-get-request.texinfo
+@include include/class-webmachine-head-request.texinfo
+@include include/class-webmachine-post-request.texinfo
+@include include/class-webmachine-put-request.texinfo
+@include include/class-webmachine-delete-request.texinfo
+@include include/class-webmachine-connect-request.texinfo
+@include include/class-webmachine-options-request.texinfo
+@include include/class-webmachine-trace-request.texinfo
+@include include/class-webmachine-patch-request.texinfo
 
 @node Reply, Request Method, Request, Top
 @chapter Reply
 
 Many accessors and slots can be used from the HUNCHENTOOT package.
 
-@include include/class-org.melusina.webmachine-reply.texinfo
-@include include/class-org.melusina.webmachine-application-reply.texinfo
-@include include/class-org.melusina.webmachine-application-slash-octet-stream-reply.texinfo
-@include include/class-org.melusina.webmachine-audio-reply.texinfo
-@include include/class-org.melusina.webmachine-font-reply.texinfo
-@include include/class-org.melusina.webmachine-image-reply.texinfo
-@include include/class-org.melusina.webmachine-image-slash-jpeg-reply.texinfo
-@include include/class-org.melusina.webmachine-image-slash-png-reply.texinfo
-@include include/class-org.melusina.webmachine-image-slash-svg-plus-xml-reply.texinfo
-@include include/class-org.melusina.webmachine-model-reply.texinfo
-@include include/class-org.melusina.webmachine-text-reply.texinfo
-@include include/class-org.melusina.webmachine-text-slash-css-reply.texinfo
-@include include/class-org.melusina.webmachine-text-slash-javascript-reply.texinfo
-@include include/class-org.melusina.webmachine-text-slash-html-reply.texinfo
-@include include/class-org.melusina.webmachine-text-slash-plain-reply.texinfo
-@include include/class-org.melusina.webmachine-video-reply.texinfo
+@include include/class-webmachine-reply.texinfo
+@include include/class-webmachine-application-reply.texinfo
+@include include/class-webmachine-application-slash-octet-stream-reply.texinfo
+@include include/class-webmachine-audio-reply.texinfo
+@include include/class-webmachine-font-reply.texinfo
+@include include/class-webmachine-image-reply.texinfo
+@include include/class-webmachine-image-slash-jpeg-reply.texinfo
+@include include/class-webmachine-image-slash-png-reply.texinfo
+@include include/class-webmachine-image-slash-svg-plus-xml-reply.texinfo
+@include include/class-webmachine-model-reply.texinfo
+@include include/class-webmachine-text-reply.texinfo
+@include include/class-webmachine-text-slash-css-reply.texinfo
+@include include/class-webmachine-text-slash-javascript-reply.texinfo
+@include include/class-webmachine-text-slash-html-reply.texinfo
+@include include/class-webmachine-text-slash-plain-reply.texinfo
+@include include/class-webmachine-video-reply.texinfo
 
 
 @node Request Method, Media Type, Reply, Top
 @chapter Repository of Request Methods
 
-@include include/class-org.melusina.webmachine-request-method.texinfo
-@include include/fun-org.melusina.webmachine-request-method-p.texinfo
-@include include/fun-org.melusina.webmachine-make-request-method.texinfo
-@include include/macro-org.melusina.webmachine-define-request-method.texinfo
-@include include/fun-org.melusina.webmachine-find-request-method.texinfo
-@include include/fun-org.melusina.webmachine-remove-request-method.texinfo
-@include include/fun-org.melusina.webmachine-list-request-methods.texinfo
-@include include/fun-org.melusina.webmachine-describe-request-methods.texinfo
+@include include/class-webmachine-request-method.texinfo
+@include include/fun-webmachine-request-method-p.texinfo
+@include include/fun-webmachine-make-request-method.texinfo
+@include include/macro-webmachine-define-request-method.texinfo
+@include include/fun-webmachine-find-request-method.texinfo
+@include include/fun-webmachine-remove-request-method.texinfo
+@include include/fun-webmachine-list-request-methods.texinfo
+@include include/fun-webmachine-describe-request-methods.texinfo
 
 
 @node Media Type, Path, Request Method, Top
 @chapter Repository of Media Types
 
-@include include/class-org.melusina.webmachine-media-type.texinfo
-@include include/fun-org.melusina.webmachine-make-media-type.texinfo
-@include include/macro-org.melusina.webmachine-define-media-type.texinfo
-@include include/fun-org.melusina.webmachine-find-media-type.texinfo
-@include include/fun-org.melusina.webmachine-remove-media-type.texinfo
-@include include/fun-org.melusina.webmachine-list-media-types.texinfo
-@include include/fun-org.melusina.webmachine-describe-media-types.texinfo
-@include include/fun-org.melusina.webmachine-match-media-type-p.texinfo
+@include include/class-webmachine-media-type.texinfo
+@include include/fun-webmachine-make-media-type.texinfo
+@include include/macro-webmachine-define-media-type.texinfo
+@include include/fun-webmachine-find-media-type.texinfo
+@include include/fun-webmachine-remove-media-type.texinfo
+@include include/fun-webmachine-list-media-types.texinfo
+@include include/fun-webmachine-describe-media-types.texinfo
+@include include/fun-webmachine-match-media-type-p.texinfo
 
 @node Path, Resource, Media Type, Top
 @chapter Resource Path
 
 @node Resource, Semantic, Path, Top
 @chapter Repository of Resources
-@include include/class-org.melusina.webmachine-resource.texinfo
-@include include/fun-org.melusina.webmachine-resource-p.texinfo
-@include include/fun-org.melusina.webmachine-find-resource.texinfo
-@include include/fun-org.melusina.webmachine-remove-resource.texinfo
+@include include/class-webmachine-resource.texinfo
+@include include/fun-webmachine-resource-p.texinfo
+@include include/fun-webmachine-find-resource.texinfo
+@include include/fun-webmachine-remove-resource.texinfo
 
 @node Semantic, Acceptor, Resource, Top
 @chapter HTTP Protocol Semantic of Resource Operations
 
-@include include/fun-org.melusina.webmachine-resource-available-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-exists-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-known-methods.texinfo
-@include include/fun-org.melusina.webmachine-resource-uri-too-long-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-payload-too-large-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-allowed-methods.texinfo
-@include include/fun-org.melusina.webmachine-resource-valid-request-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-authorized-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-forbidden-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-valid-content-headers-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-valid-content-type-p.texinfo
-@include include/fun-org.melusina.webmachine-resource-options.texinfo
-@include include/fun-org.melusina.webmachine-resource-languages-provided.texinfo
-@include include/fun-org.melusina.webmachine-resource-content-types-provided.texinfo
-@include include/fun-org.melusina.webmachine-resource-charsets-provided.texinfo
-@include include/fun-org.melusina.webmachine-resource-encodings-provided.texinfo
+@include include/fun-webmachine-resource-available-p.texinfo
+@include include/fun-webmachine-resource-exists-p.texinfo
+@include include/fun-webmachine-resource-known-methods.texinfo
+@include include/fun-webmachine-resource-uri-too-long-p.texinfo
+@include include/fun-webmachine-resource-payload-too-large-p.texinfo
+@include include/fun-webmachine-resource-allowed-methods.texinfo
+@include include/fun-webmachine-resource-valid-request-p.texinfo
+@include include/fun-webmachine-resource-authorized-p.texinfo
+@include include/fun-webmachine-resource-forbidden-p.texinfo
+@include include/fun-webmachine-resource-valid-content-headers-p.texinfo
+@include include/fun-webmachine-resource-valid-content-type-p.texinfo
+@include include/fun-webmachine-resource-options.texinfo
+@include include/fun-webmachine-resource-languages-provided.texinfo
+@include include/fun-webmachine-resource-content-types-provided.texinfo
+@include include/fun-webmachine-resource-charsets-provided.texinfo
+@include include/fun-webmachine-resource-encodings-provided.texinfo
 
 @node Acceptor, , Resource, Top
 @chapter Acceptor
 
-@include include/class-org.melusina.webmachine-acceptor.texinfo
-@include include/fun-org.melusina.webmachine-make-acceptor.texinfo
+@include include/class-webmachine-acceptor.texinfo
+@include include/fun-webmachine-make-acceptor.texinfo
 
 @bye

@@ -11,10 +11,9 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(defpackage #:org.melusina.webmachine/signature
+(defpackage #:webmachine/signature
   (:use #:cl #:parenscript)
   (:local-nicknames
-   (#:webmachine #:org.melusina.webmachine)
    (#:who #:cl-who))
   (:export
    #:verify-hmac-authorization-trait
@@ -24,7 +23,7 @@
    #:signature-javascript
    #:testsuite-signature-javascript))
 
-(in-package #:org.melusina.webmachine/signature)
+(in-package #:webmachine/signature)
 
 (defparameter *signature-algorithm*
   '(:external-format :utf-8
@@ -829,19 +828,19 @@ This must be implemented by resources using `HMAC-AUHTORIZATION'."))
 			#'find-key))))
 
 
-(in-package #:org.melusina.webmachine/example)
+(in-package #:webmachine/example)
 
 
 ;;;;
 ;;;; Example 
 ;;;;
 
-(defclass private-constant-resource (org.melusina.webmachine/signature:verify-hmac-authorization-trait webmachine:constant-resource)
+(defclass private-constant-resource (webmachine/signature:verify-hmac-authorization-trait webmachine:constant-resource)
   ((signature-key-repository
     :initarg :signature-key-repository
     :initform nil)))
 
-(defmethod org.melusina.webmachine/signature:find-signature-key ((resource private-constant-resource) identity)
+(defmethod webmachine/signature:find-signature-key ((resource private-constant-resource) identity)
   (cdr (assoc identity (slot-value resource 'signature-key-repository) :test #'string=)))
 
 (defun make-example-data ()
@@ -916,8 +915,8 @@ This must be implemented by resources using `HMAC-AUHTORIZATION'."))
     (signature-state-javascript)
     (html-page-title "Signature")
     (demonstrate-signature-button)
-    (org.melusina.webmachine/signature:testsuite-javascript)
-    (org.melusina.webmachine/signature:signature-javascript)
-    (org.melusina.webmachine/signature:testsuite-signature-javascript)))
+    (webmachine/signature:testsuite-javascript)
+    (webmachine/signature:signature-javascript)
+    (webmachine/signature:testsuite-signature-javascript)))
 
 ;;;; End of file `signature.lisp'

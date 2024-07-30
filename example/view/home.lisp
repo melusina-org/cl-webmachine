@@ -11,7 +11,7 @@
 ;;;; you should have received as part of this distribution. The terms
 ;;;; are also available at https://opensource.org/licenses/MIT
 
-(in-package #:org.melusina.webmachine/example)
+(in-package #:webmachine/example)
 
 (define-constant-resource (view-home :uri "/home" :content-type :text/html)
   (html-page (:title "Home for Webmachine Example"
