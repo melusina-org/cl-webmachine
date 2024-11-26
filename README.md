@@ -39,8 +39,8 @@ example of a web application written with Webmachine.
 
 ~~~ lisp
 Cl-USER> (ql:quickload "org.melusina.webmachine/example")
-Cl-USER> (org.melusina.webmachine/example:create-users)
-Cl-USER> (org.melusina.webmachine/example:start)
+Cl-USER> (webmachine/example:create-users)
+Cl-USER> (webmachine/example:start)
 ~~~
 
 Browse to `http://localhost:8080/about` to interact with the
@@ -59,7 +59,7 @@ testsuite. Run it with:
 
 ~~~ lisp
 Cl-USER> (ql:quickload "org.melusina.webmachine/testsuite")
-Cl-USER> (org.melusina.webmachine/testsuite:run-all-tests)
+Cl-USER> (webmachine/testsuite:run-all-tests)
 …
 Name: ORG.MELUSINA.WEBMACHINE/TESTSUITE:RUN-ALL-TESTS
 Total: 159
@@ -79,7 +79,7 @@ tools, most importantly a linter and a file template.
 
 ~~~ lisp
 Cl-USER> (ql:quickload "org.melusina.webmachine/development")
-Cl-USER> (org.melusina.webmachine/development:lint)
+Cl-USER> (webmachine/development:lint)
 ~~~
 
 
