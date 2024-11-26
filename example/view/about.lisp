@@ -109,7 +109,7 @@
 	 "Build and customize with Sass, utilize prebuilt grid system"
 	 "and components, and bring projects to life with powerful"
 	 "JavaScript plugins.")
-     :version "5.3.0-alpha3"
+     :version "5.3.3"
      :license "MIT"
      :actions
      '(("Homepage" . "https://getbootstrap.com")
@@ -186,8 +186,7 @@
        ("Repository" .
 	"https://gitlab.common-lisp.net/parenscript/parenscript.git")
        ("Documentation" .
-	"https://parenscript.common-lisp.dev/reference.html")))
-    ))
+	"https://parenscript.common-lisp.dev/reference.html")))))
 
 
 ;;;;
